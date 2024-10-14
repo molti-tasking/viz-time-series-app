@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "babylonjs-hook": "^0.1.1",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "lucide-react": "^0.452.0",
@@ -19,6 +20,8 @@
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
+    "@babylonjs/core": "^7.29.0",
+    "@babylonjs/inspector": "^7.29.0",
     "@nabla/vite-plugin-eslint": "2.0.4",
     "@types/node": "^20.16.11",
     "@types/react": "18.3.3",
