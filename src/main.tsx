@@ -6,6 +6,7 @@ import Root from "./routes/root";
 import ErrorPage from "./error-page";
 import Anu from "./routes/anu";
 import Home from "./routes/home";
+import TimeSeries from "./routes/time-series";
 
 const router = createBrowserRouter([
   {
@@ -15,7 +16,12 @@ const router = createBrowserRouter([
 
     children: [
       { path: "", element: <Home /> },
-      { path: "anu", element: <Anu /> },
+      { path: "anu", element: <Anu />, errorElement: <ErrorPage /> },
+      {
+        path: "time-series",
+        element: <TimeSeries />,
+        errorElement: <ErrorPage />,
+      },
     ],
   },
 ]);

@@ -18,6 +18,12 @@ export default function Root() {
             <a className="text-sm text-teal-200 hover:text-white" href={`/anu`}>
               Anu
             </a>
+            <a
+              className="text-sm text-teal-200 hover:text-white"
+              href={`/time-series`}
+            >
+              2D interactive Viz
+            </a>
           </div>
         </div>
       </nav>
