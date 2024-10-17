@@ -2,7 +2,7 @@ import { Outlet } from "react-router-dom";
 
 export default function Root() {
   return (
-    <div>
+    <div className="flex flex-col min-h-screen">
       <nav className="bg-teal-500 py-2">
         <div className="container flex items-center flex-wrap ">
           <div className="text-white mr-6">
@@ -27,7 +27,7 @@ export default function Root() {
           </div>
         </div>
       </nav>
-      <div className="container">
+      <div className="h-full w-full flex flex-1">
         <Outlet />
       </div>
     </div>

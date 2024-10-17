@@ -6,34 +6,21 @@ import {
   Vector3,
   Color3,
   Mesh,
-  VertexBuffer,
   Engine,
   type EngineOptions,
   type SceneOptions,
-  circleOfConfusionPixelShader,
-  StandardMaterial,
 } from "@babylonjs/core";
 // import * as anu from "@jpmorganchase/anu";
 import * as anu from "../../../anu/";
-import {
-  timeParse,
-  utcFormat,
-  extent,
-  scaleLinear,
-  timeFormat,
-  scaleTime,
-  scalePoint,
-  scaleSequential,
-  interpolateBlues,
-  timeYear,
-  csvParse,
-} from "d3";
+import { utcFormat, scaleLinear, scalePoint, csvParse, extent } from "d3";
 import rawData from "./data_entries.csv?raw";
-import { M } from "node_modules/vite/dist/node/types.d-aGj9QkWt";
+import { Inspector } from "@babylonjs/inspector";
 
 const data = csvParse(rawData);
 
 const onSceneReady = (scene: Scene) => {
+  Inspector.Show(scene, {});
+
   // SET UP CAMERA
   //Add a camera that rotates around the origin and adjust its properties
   const camera = new ArcRotateCamera(
@@ -63,10 +50,12 @@ const onSceneReady = (scene: Scene) => {
 
   //Create the D3 functions that we will use to scale our data dimensions to desired output ranges for our visualization
   //In this case, we create scale functions that correspond to the x, y, and z positions and color
-  let scaleX = scaleLinear().domain(dates);
+  // let scaleX = scaleLinear().domain(dates);
+  let scaleX = scaleLinear()
+    .domain(extent(data, (d) => new Date(+d.timestamp)))
+    .range([0, 1]); // Adjust range according to your visualization needs
   let scaleY = scaleLinear().domain([20, 30]); // .range([0, 1]).nice();
   let scaleZ = scalePoint().domain(dimensions);
-  let scaleC = scaleSequential(interpolateBlues).domain([1, -1]);
 
   //For each column/year/line, map it to its x, y, and z position along each timestep using the D3 scale functions
   let paths = dimensions.map((col) => {
@@ -82,9 +71,6 @@ const onSceneReady = (scene: Scene) => {
 
   //Bind a new CoT
   let CoT = anu.bind("cot");
-
-  // material
-  var mat = new StandardMaterial("mat1", scene);
 
   //Bind a new ribbon mesh to the CoT, which we will need to update manually to create our 3D line chart
   let ribbon = CoT.bind(
@@ -137,53 +123,15 @@ const onSceneReady = (scene: Scene) => {
   });
 
   //Add some additional red lines for each line (column)
-  let redLines = CoT.bind("lineSystem", { lines: paths })
+  CoT.bind("lineSystem", { lines: paths })
+
     .attr("color", Color3.Red())
     .prop("alpha", 0.9);
 
   //Add an additional green line to the front-most line
-  let greenOutline = CoT.bind("lines", { points: paths[0] }).attr(
-    "color",
-    Color3.Green()
-  );
-
-  //   // SET UP A BOX AND GROUND
-  //   // Our built-in 'box' shape.
-  //   box = MeshBuilder.CreateBox("box", { size: 2 }, scene);
-  //   // Move the box upward 1/2 its height
-  //   box.position.y = 1;
-  //   // Our built-in 'ground' shape.
-  //   MeshBuilder.CreateGround("ground", { width: 6, height: 6 }, scene);
-
-  // SET UP ANU BOX
-
-  // let cot = anu.bind("cot");
-  // let spheres = cot.bind("sphere", { diameter: 0.5 }, iris);
-
-  // let extentX: Iterable<NumberValue> = extent(
-  //   map(iris, (d) => {
-  //     return d.sepalLength;
-  //   })
-  // );
-  // let extentY: Iterable<NumberValue> = extent(
-  //   map(iris, (d) => {
-  //     return d.petalLength;
-  //   })
-  // );
-  // let extentZ: Iterable<NumberValue> = extent(
-  //   map(iris, (d) => {
-  //     return d.sepalWidth;
-  //   })
-  // );
-
-  // let scaleX = scaleLinear().domain(extentX).range([-20, 20]).nice();
-  // let scaleY = scaleLinear().domain(extentY).range([-20, 20]).nice();
-  // let scaleZ = scaleLinear().domain(extentZ).range([-20, 20]).nice();
-
-  // spheres
-  //   .positionX((d) => scaleX(d.sepalLength))
-  //   .positionY((d) => scaleY(d.petalLength))
-  //   .positionZ((d) => scaleZ(d.sepalWidth));
+  CoT.bind("lines", { points: paths[0] })
+    .attr("color", Color3.Green())
+    .prop("alpha", 0.9);
 };
 
 /**
@@ -198,15 +146,13 @@ const onRender = (scene: Scene) => {
 };
 
 export const BabylonScene = () => (
-  <div className="w-full">
-    <SceneComponent
-      antialias
-      onSceneReady={onSceneReady}
-      onRender={onRender}
-      id="my-canvas"
-      className="w-full"
-    />
-  </div>
+  <SceneComponent
+    antialias
+    onSceneReady={onSceneReady}
+    onRender={onRender}
+    id="my-canvas"
+    className="w-full h-full flex-1"
+  />
 );
 
 interface SceneProps
