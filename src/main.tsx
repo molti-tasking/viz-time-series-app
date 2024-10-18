@@ -6,7 +6,8 @@ import Root from "./routes/root";
 import ErrorPage from "./error-page";
 import Anu from "./routes/anu";
 import Home from "./routes/home";
-import TimeSeries from "./routes/time-series";
+import MultiLine from "./routes/multi-line";
+import AggrLine from "./routes/aggregated-line";
 
 const router = createBrowserRouter([
   {
@@ -18,8 +19,13 @@ const router = createBrowserRouter([
       { path: "", element: <Home /> },
       { path: "anu", element: <Anu />, errorElement: <ErrorPage /> },
       {
-        path: "time-series",
-        element: <TimeSeries />,
+        path: "multi-line",
+        element: <MultiLine />,
+        errorElement: <ErrorPage />,
+      },
+      {
+        path: "aggregated-line",
+        element: <AggrLine />,
         errorElement: <ErrorPage />,
       },
     ],
