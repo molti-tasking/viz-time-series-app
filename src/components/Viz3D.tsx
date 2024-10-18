@@ -50,6 +50,7 @@ const onSceneReady = (scene: Scene) => {
   // This variable dynamically sets the x scale; it should be used as negative and positive value for scaleX in order to ensure that it will be stretched along the center
   const xExtension = Math.max(Math.min(data.length / 20, 4), 2);
   const scaleX = scaleLinear()
+    // @ts-expect-error d3 typing has issues
     .domain(extent(data, (d) => Number(+d.timestamp)))
     .range([-xExtension, xExtension]); // Adjust range according to your visualization needs
   const scaleY = scaleLinear().domain([10, 40]);
@@ -79,6 +80,7 @@ const onSceneReady = (scene: Scene) => {
   CoT.bind(
     "ribbon",
     {
+      // @ts-expect-error anu typing has issues
       pathArray: paths,
       updatable: true,
       sideOrientation: Mesh.DOUBLESIDE,
@@ -89,6 +91,8 @@ const onSceneReady = (scene: Scene) => {
   const formatTime = utcFormat("%M:%S:%L");
   //Use the createAxes() Anu helper function to create the axes for us based on our D3 scale functions
   //Also adjust its visual properties to properly format the axes labels
+
+  // @ts-expect-error anu typing has issues
   anu.createAxes("test", scene, {
     parent: CoT,
     scale: { x: scaleX, y: scaleY, z: scaleZ },
@@ -100,6 +104,8 @@ const onSceneReady = (scene: Scene) => {
       y: scaleY.ticks(5),
     },
     labelFormat: {
+      // @ts-expect-error anu typing has issues
+
       x: (text: number) => formatTime(text),
     },
   });
@@ -138,6 +144,7 @@ const onSceneReady = (scene: Scene) => {
   };
 
   //Add some additional red lines for each line (column)
+  // @ts-expect-error anu typing has issues
   CoT.bind("lineSystem", { lines: paths })
     .attr("color", Color3.Teal())
     .prop("alpha", 0.3);
@@ -150,27 +157,16 @@ const onSceneReady = (scene: Scene) => {
   spheres.position((d) => d);
   spheres
     .material(
+      // @ts-expect-error anu typing has issues
       (_1, _2, index) => new StandardMaterial("myMaterial" + index, scene)
     )
     .diffuseColor((d) => getColorByValue(scaleY.invert(d.y)));
-};
-
-/**
- * Will run on every frame render.  We are spinning the box on y-axis.
- */
-const onRender = (scene: Scene) => {
-  //   if (box !== undefined) {
-  //     const deltaTimeInMillis = scene.getEngine().getDeltaTime();
-  //     const rpm = 10;
-  //     box.rotation.y += (rpm / 60) * Math.PI * 2 * (deltaTimeInMillis / 1000);
-  //   }
 };
 
 export const Viz3D = () => (
   <SceneComponent
     antialias
     onSceneReady={onSceneReady}
-    onRender={onRender}
     id="my-canvas"
     className="w-full h-full flex-1"
   />
