@@ -11,20 +11,16 @@ import {
   type SceneOptions,
   StandardMaterial,
 } from "@babylonjs/core";
+// import * as anu from "../../../anu/";
 import * as anu from "@jpmorganchase/anu";
-import {
-  utcFormat,
-  scaleLinear,
-  scalePoint,
-  csvParse,
-  extent,
-  quantile,
-} from "d3";
-import rawData from "../data_entries.csv?raw";
+import { utcFormat, scaleLinear, scalePoint, extent, quantile } from "d3";
+import { useDataContext } from "./RawDataContext";
 
-const data = csvParse(rawData);
-
-const onSceneReady = (scene: Scene) => {
+const onSceneReady = (
+  scene: Scene,
+  dimensions: string[],
+  values: Record<string, number>[]
+) => {
   // SET UP CAMERA
   //Add a camera that rotates around the origin and adjust its properties
   const camera = new ArcRotateCamera(
@@ -45,17 +41,16 @@ const onSceneReady = (scene: Scene) => {
   const light = new HemisphericLight("light", new Vector3(0, 1, 0), scene);
   // Default intensity is 1. Let's dim the light a small amount
   light.intensity = 0.7;
-
+  const data = values;
   // This variable dynamically sets the x scale; it should be used as negative and positive value for scaleX in order to ensure that it will be stretched along the center
   const xExtension = Math.max(Math.min(data.length / 20, 4), 2);
   const scaleX = scaleLinear()
     // @ts-expect-error d3 typing has issues
     .domain(extent(data, (d) => Number(+d.timestamp)))
     .range([-xExtension, xExtension]); // Adjust range according to your visualization needs
-  const scaleY = scaleLinear().domain([10, 40]);
+  const scaleY = scaleLinear().domain([1, 10]);
 
   //Specify the columns in our dataset that should each be its own line
-  const dimensions = data.columns.filter((col) => col !== "timestamp");
 
   const scaleZ = scalePoint().domain(dimensions).range([-1, 1]);
   // scaleLinear().domain([10, 40]).range(["blue", "red"]);
@@ -159,14 +154,18 @@ const onSceneReady = (scene: Scene) => {
     .diffuseColor((d: { y: number }) => getColorByValue(scaleY.invert(d.y)));
 };
 
-export const Viz3D = () => (
-  <SceneComponent
-    antialias
-    onSceneReady={onSceneReady}
-    id="my-canvas"
-    className="w-full h-full flex-1"
-  />
-);
+export const Viz3D = () => {
+  const { dimensions, values } = useDataContext();
+
+  return (
+    <SceneComponent
+      antialias
+      onSceneReady={(scene) => onSceneReady(scene, dimensions, values)}
+      id="my-canvas"
+      className="w-full h-full flex-1"
+    />
+  );
+};
 
 interface SceneProps
   extends React.DetailedHTMLProps<

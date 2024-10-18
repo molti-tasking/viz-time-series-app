@@ -8,6 +8,7 @@ import Anu from "./routes/anu";
 import Home from "./routes/home";
 import MultiLine from "./routes/multi-line";
 import AggrLine from "./routes/aggregated-line";
+import { RawDataContextProvider } from "./components/RawDataContext";
 
 const router = createBrowserRouter([
   {
@@ -37,6 +38,8 @@ const root = ReactDOM.createRoot(rootElement);
 
 root.render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <RawDataContextProvider>
+      <RouterProvider router={router} />
+    </RawDataContextProvider>
   </StrictMode>
 );

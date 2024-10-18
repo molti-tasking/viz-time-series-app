@@ -1,4 +1,4 @@
-import { Outlet } from "react-router-dom";
+import { Link, Outlet } from "react-router-dom";
 
 export default function Root() {
   const routes = [
@@ -19,12 +19,13 @@ export default function Root() {
 
           <div className="flex flex-row gap-4 mx-8 ">
             {routes.map((r) => (
-              <a
+              <Link
                 className="text-sm text-teal-200 hover:text-white"
-                href={r.href}
+                key={r.href}
+                to={r.href}
               >
                 {r.title}
-              </a>
+              </Link>
             ))}
           </div>
         </div>
