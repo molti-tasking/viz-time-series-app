@@ -11,8 +11,8 @@ import {
   type SceneOptions,
   StandardMaterial,
 } from "@babylonjs/core";
-// import * as anu from "@jpmorganchase/anu";
 import * as anu from "../../../anu/";
+// import * as anu from "@jpmorganchase/anu";
 import {
   utcFormat,
   scaleLinear,
@@ -21,7 +21,7 @@ import {
   extent,
   quantile,
 } from "d3";
-import rawData from "./data_entries.csv?raw";
+import rawData from "../data_entries.csv?raw";
 
 const data = csvParse(rawData);
 
@@ -166,7 +166,7 @@ const onRender = (scene: Scene) => {
   //   }
 };
 
-export const BabylonScene = () => (
+export const Viz3D = () => (
   <SceneComponent
     antialias
     onSceneReady={onSceneReady}

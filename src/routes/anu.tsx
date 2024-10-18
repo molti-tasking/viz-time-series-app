@@ -1,5 +1,5 @@
-import { BabylonScene } from "./app";
+import { Viz3D } from "@/components/Viz3D";
 
 export default function Anu() {
-  return <BabylonScene />;
+  return <Viz3D />;
 }
