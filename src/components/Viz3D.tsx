@@ -11,8 +11,7 @@ import {
   type SceneOptions,
   StandardMaterial,
 } from "@babylonjs/core";
-import * as anu from "../../../anu/";
-// import * as anu from "@jpmorganchase/anu";
+import * as anu from "@jpmorganchase/anu";
 import {
   utcFormat,
   scaleLinear,
@@ -80,7 +79,6 @@ const onSceneReady = (scene: Scene) => {
   CoT.bind(
     "ribbon",
     {
-      // @ts-expect-error anu typing has issues
       pathArray: paths,
       updatable: true,
       sideOrientation: Mesh.DOUBLESIDE,
@@ -92,7 +90,6 @@ const onSceneReady = (scene: Scene) => {
   //Use the createAxes() Anu helper function to create the axes for us based on our D3 scale functions
   //Also adjust its visual properties to properly format the axes labels
 
-  // @ts-expect-error anu typing has issues
   anu.createAxes("test", scene, {
     parent: CoT,
     scale: { x: scaleX, y: scaleY, z: scaleZ },
@@ -144,7 +141,6 @@ const onSceneReady = (scene: Scene) => {
   };
 
   //Add some additional red lines for each line (column)
-  // @ts-expect-error anu typing has issues
   CoT.bind("lineSystem", { lines: paths })
     .attr("color", Color3.Teal())
     .prop("alpha", 0.3);

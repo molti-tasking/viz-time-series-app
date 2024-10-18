@@ -6,6 +6,11 @@ export default function Home() {
         This page overall is under construction. So far you can use the nav to
         view different vizualisations of some time series data.
       </p>
+      <p>
+        Note: The anu.js dependency has issues at the moment, which is why it
+        only runs locally when the repo being cloned. Maybe this will be fixed
+        soon.
+      </p>
     </div>
   );
 }
