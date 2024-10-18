@@ -126,6 +126,5 @@ const spec: VisualizationSpec = {
 };
 
 export const AggregatedLineChart = () => {
-  // className="container w-screen"
   return <VegaLite spec={spec} className="container w-full mt-2" />;
 };
