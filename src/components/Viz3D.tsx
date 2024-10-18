@@ -150,13 +150,13 @@ const onSceneReady = (scene: Scene) => {
     { diameter: 0.03 },
     paths.flatMap((d) => [...d])
   );
-  spheres.position((d) => d);
+  spheres.position((d: number) => d);
   spheres
     .material(
       // @ts-expect-error anu typing has issues
       (_1, _2, index) => new StandardMaterial("myMaterial" + index, scene)
     )
-    .diffuseColor((d) => getColorByValue(scaleY.invert(d.y)));
+    .diffuseColor((d: { y: number }) => getColorByValue(scaleY.invert(d.y)));
 };
 
 export const Viz3D = () => (
