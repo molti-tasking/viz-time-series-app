@@ -9,18 +9,23 @@ import {
   Engine,
   type EngineOptions,
   type SceneOptions,
+  StandardMaterial,
 } from "@babylonjs/core";
 // import * as anu from "@jpmorganchase/anu";
 import * as anu from "../../../anu/";
-import { utcFormat, scaleLinear, scalePoint, csvParse, extent } from "d3";
+import {
+  utcFormat,
+  scaleLinear,
+  scalePoint,
+  csvParse,
+  extent,
+  quantile,
+} from "d3";
 import rawData from "./data_entries.csv?raw";
-import { Inspector } from "@babylonjs/inspector";
 
 const data = csvParse(rawData);
 
 const onSceneReady = (scene: Scene) => {
-  Inspector.Show(scene, {});
-
   // SET UP CAMERA
   //Add a camera that rotates around the origin and adjust its properties
   const camera = new ArcRotateCamera(
@@ -42,23 +47,21 @@ const onSceneReady = (scene: Scene) => {
   // Default intensity is 1. Let's dim the light a small amount
   light.intensity = 0.7;
 
+  // This variable dynamically sets the x scale; it should be used as negative and positive value for scaleX in order to ensure that it will be stretched along the center
+  const xExtension = Math.max(Math.min(data.length / 20, 4), 2);
+  const scaleX = scaleLinear()
+    .domain(extent(data, (d) => Number(+d.timestamp)))
+    .range([-xExtension, xExtension]); // Adjust range according to your visualization needs
+  const scaleY = scaleLinear().domain([10, 40]);
+
   //Specify the columns in our dataset that should each be its own line
-  let dimensions = data.columns.filter((col) => col !== "timestamp");
+  const dimensions = data.columns.filter((col) => col !== "timestamp");
 
-  //Get all of the dates in our dataset into an array so that we can easily get its extents later
-  let dates: Number[] = data.map((d) => Number(d.timestamp));
-
-  //Create the D3 functions that we will use to scale our data dimensions to desired output ranges for our visualization
-  //In this case, we create scale functions that correspond to the x, y, and z positions and color
-  // let scaleX = scaleLinear().domain(dates);
-  let scaleX = scaleLinear()
-    .domain(extent(data, (d) => new Date(+d.timestamp)))
-    .range([0, 1]); // Adjust range according to your visualization needs
-  let scaleY = scaleLinear().domain([20, 30]); // .range([0, 1]).nice();
-  let scaleZ = scalePoint().domain(dimensions);
-
+  const scaleZ = scalePoint().domain(dimensions).range([-1, 1]);
+  // scaleLinear().domain([10, 40]).range(["blue", "red"]);
+  // let scaleColor = scaleSequential(interpolateBlues).domain([10, 40]);
   //For each column/year/line, map it to its x, y, and z position along each timestep using the D3 scale functions
-  let paths = dimensions.map((col) => {
+  const paths = dimensions.map((col) => {
     return data.map(
       (row) =>
         new Vector3(
@@ -70,10 +73,10 @@ const onSceneReady = (scene: Scene) => {
   });
 
   //Bind a new CoT
-  let CoT = anu.bind("cot");
+  const CoT = anu.bind("cot");
 
   //Bind a new ribbon mesh to the CoT, which we will need to update manually to create our 3D line chart
-  let ribbon = CoT.bind(
+  CoT.bind(
     "ribbon",
     {
       pathArray: paths,
@@ -81,34 +84,9 @@ const onSceneReady = (scene: Scene) => {
       sideOrientation: Mesh.DOUBLESIDE,
     },
     []
-  ); //  .selected[0]; // Get the Babylon Mesh that Anu had created for us, which had been stored in this selected property as an element of an array
+  );
 
-  //The ribbon already has our position values, but we now need to set its color values for each vertex in its mesh (data row)
-  //Retrieve the VertexBuffer of position values of the ribbon, these are stored as Numbers in a flat array [x0, y0, z0, x1, y1, z1, ...]
-  // let positions = ribbon.getVerticesData(VertexBuffer.PositionKind);
-  // let colors = [];
-  // console.log(ribbon.get("vertic"));
-  // //Loop through our position buffer
-  // for (let p = 0; p < positions.length; p += 3) {
-  //   //Get the color that this vertex should have based on its y-axis value
-  //   let colorString = scaleC(positions[p + 1]);
-  //   //Our scaleC function, which is from D3, returns a string in the format 'rgb(r, g, b)', so we need to parse this
-  //   let color = colorString
-  //     .substring(4, colorString.length - 1)
-  //     .replace(/ /g, "")
-  //     .split(",");
-  //   //Store our new color
-  //   colors.push(color[0] / 255, color[1] / 255, color[2] / 255, 1);
-  // }
-
-  // if (ribbon) {
-  //   //Set our new color values to the ribbon
-  //   ribbon.setVerticesData(VertexBuffer.ColorKind, colors);
-  //   //Turn off picking to improve performance of our complex mesh geometry
-  //   ribbon.isPickable = false;
-  // }
-
-  const formatTime = utcFormat("%H:%M:%S");
+  const formatTime = utcFormat("%M:%S:%L");
   //Use the createAxes() Anu helper function to create the axes for us based on our D3 scale functions
   //Also adjust its visual properties to properly format the axes labels
   anu.createAxes("test", scene, {
@@ -117,21 +95,64 @@ const onSceneReady = (scene: Scene) => {
     // domainMaterialOptions: { color: Color3.White(), width: 4 },
     // gridTicks: { x: scaleX.ticks() },
     // labelTicks: { x: scaleX.ticks() },
+    labelTicks: {
+      x: scaleX.ticks(5),
+      y: scaleY.ticks(5),
+    },
     labelFormat: {
-      x: (text: number) => formatTime(new Date(text)),
+      x: (text: number) => formatTime(text),
     },
   });
 
+  // Calculate the thresholds using D3
+  const allYValues = data.flatMap((row) =>
+    dimensions.map((col) => Number(row[col]))
+  );
+
+  const threshold25 = quantile(allYValues, 0.25);
+  const threshold45 = quantile(allYValues, 0.5);
+  const threshold55 = quantile(allYValues, 0.75);
+
+  // Define a function to determine the color based on a Y-value
+  const getColorByValue = (value: number) => {
+    if (threshold25 !== undefined && value <= threshold25) {
+      return Color3.White();
+    }
+    if (
+      threshold25 !== undefined &&
+      threshold45 !== undefined &&
+      value > threshold25 &&
+      value <= threshold45
+    ) {
+      return Color3.Yellow();
+    }
+    if (
+      threshold45 !== undefined &&
+      threshold55 !== undefined &&
+      value > threshold45 &&
+      value <= threshold55
+    ) {
+      return Color3.Magenta();
+    }
+    return Color3.Red();
+  };
+
   //Add some additional red lines for each line (column)
   CoT.bind("lineSystem", { lines: paths })
+    .attr("color", Color3.Teal())
+    .prop("alpha", 0.3);
 
-    .attr("color", Color3.Red())
-    .prop("alpha", 0.9);
-
-  //Add an additional green line to the front-most line
-  CoT.bind("lines", { points: paths[0] })
-    .attr("color", Color3.Green())
-    .prop("alpha", 0.9);
+  const spheres = CoT.bind(
+    "sphere",
+    { diameter: 0.03 },
+    paths.flatMap((d) => [...d])
+  );
+  spheres.position((d) => d);
+  spheres
+    .material(
+      (_1, _2, index) => new StandardMaterial("myMaterial" + index, scene)
+    )
+    .diffuseColor((d) => getColorByValue(scaleY.invert(d.y)));
 };
 
 /**
