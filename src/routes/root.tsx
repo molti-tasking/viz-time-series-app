@@ -7,7 +7,9 @@ export default function Root() {
     { title: "Anu Multi Line", href: "/anu" },
     { title: "2D Multi Line", href: "/multi-line" },
     { title: "2D Aggregated", href: "/aggregated-line" },
+    { title: "2D Multi Aggregated", href: "/multi-aggregated-line" },
   ];
+
   return (
     <div className="flex flex-col min-h-screen">
       <nav className="bg-primary text-primary-foreground py-2">

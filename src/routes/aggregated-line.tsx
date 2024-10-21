@@ -1,5 +1,5 @@
 import { AggregatedLineChart } from "@/components/AggregatedLineChart";
 
-export default function MultiLine() {
+export default function AggregatedLine() {
   return <AggregatedLineChart />;
 }

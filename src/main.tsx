@@ -9,6 +9,7 @@ import Home from "./routes/home";
 import MultiLine from "./routes/multi-line";
 import AggrLine from "./routes/aggregated-line";
 import { RawDataContextProvider } from "./components/RawDataContext";
+import MutliAggregatedLine from "./routes/multi-aggregated-line";
 
 const router = createBrowserRouter([
   {
@@ -27,6 +28,11 @@ const router = createBrowserRouter([
       {
         path: "aggregated-line",
         element: <AggrLine />,
+        errorElement: <ErrorPage />,
+      },
+      {
+        path: "multi-aggregated-line",
+        element: <MutliAggregatedLine />,
         errorElement: <ErrorPage />,
       },
     ],
