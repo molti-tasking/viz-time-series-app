@@ -91,7 +91,7 @@ export const RawDataContextProvider = ({
 
   useEffect(() => {
     if (!data.length) {
-      generateData(20, 40);
+      generateData(2, 4);
     }
   }, []);
   return (

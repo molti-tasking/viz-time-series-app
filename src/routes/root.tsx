@@ -1,3 +1,4 @@
+import { SettingsPopover } from "@/components/SettingsPopover";
 import { Link, Outlet } from "react-router-dom";
 
 export default function Root() {
@@ -9,7 +10,7 @@ export default function Root() {
   ];
   return (
     <div className="flex flex-col min-h-screen">
-      <nav className="bg-teal-500 py-2">
+      <nav className="bg-primary text-primary-foreground py-2">
         <div className="container flex items-center flex-wrap ">
           <div className="text-white mr-6">
             <span className="font-semibold text-xl tracking-tight">
@@ -20,7 +21,7 @@ export default function Root() {
           <div className="flex flex-row gap-4 mx-8 ">
             {routes.map((r) => (
               <Link
-                className="text-sm text-teal-200 hover:text-white"
+                className="text-sm hover:underline"
                 key={r.href}
                 to={r.href}
               >
@@ -28,6 +29,8 @@ export default function Root() {
               </Link>
             ))}
           </div>
+          <div className="flex-1"></div>
+          <SettingsPopover />
         </div>
       </nav>
       <div className="h-full w-full flex flex-1">
