@@ -1,29 +1,43 @@
 import { VegaLite, type VisualizationSpec } from "react-vega";
 import { useDataContext } from "./RawDataContext";
 import { clustering } from "@/lib/clustering";
+import { Input } from "./ui/input";
+import { useState } from "react";
 
 export const MultiAggregatedLineChart = () => {
-  const { dimensions, values } = useDataContext();
-  console.log(JSON.stringify(values));
+  const { values } = useDataContext();
 
-  const aggregated = clustering(values, 2);
-  console.log(aggregated);
+  const [clusterCount, setClusterCount] = useState(2);
+  const aggregated = clustering(values, clusterCount);
 
   return (
-    <div className="container w-full my-2 flex flex-row flex-wrap gap-2">
+    <div className="container w-full my-2 flex flex-col flex-wrap gap-2">
+      <div className="flex flex-row gap-4 items-center">
+        <span>Amount of clusters (sorted by last value)</span>
+        <div>
+          <Input
+            value={clusterCount}
+            onChange={(event) => setClusterCount(event.target.valueAsNumber)}
+            type="number"
+          />
+        </div>
+      </div>
+      {/* <div className="w-full my-2 flex flex-row flex-wrap gap-2"> */}
       {aggregated.map((val, index) => (
-        <AggregatedLineChart dimensions={dimensions} values={val} key={index} />
+        <AggregatedLineChart values={val} key={index} />
       ))}
+      {/* </div> */}
     </div>
   );
 };
 const AggregatedLineChart = ({
   values,
-  dimensions,
 }: {
-  dimensions: string[];
   values: Record<string, number>[];
 }) => {
+  const dimensions = values.length
+    ? Object.keys(values[0]).filter((e) => e !== "timestamp")
+    : [];
   const spec: VisualizationSpec = {
     $schema: "https://vega.github.io/schema/vega-lite/v5.json",
     width: "container",
@@ -36,110 +50,33 @@ const AggregatedLineChart = ({
         fold: dimensions,
         as: ["variable", "value"],
       },
-      {
-        calculate: "toNumber(datum.value)",
-        as: "value",
-      },
-      {
-        calculate: "toNumber(datum.timestamp)",
-        as: "timestamp",
-      },
-      {
-        aggregate: [
-          {
-            op: "mean",
-            field: "value",
-            as: "mean_value",
-          },
-          {
-            op: "max",
-            field: "value",
-            as: "max_value",
-          },
-          {
-            op: "min",
-            field: "value",
-            as: "min_value",
-          },
-          {
-            op: "q1",
-            field: "value",
-            as: "q1_value",
-          },
-          {
-            op: "q3",
-            field: "value",
-            as: "q3_value",
-          },
-        ],
-        groupby: ["timestamp"],
-      },
-      {
-        fold: ["mean_value", "max_value", "min_value", "q1_value", "q3_value"],
-        as: ["aggregation", "value"],
-      },
+      // {
+      //   calculate: "toNumber(datum.value)",
+      //   as: "value",
+      // },
+      // {
+      //   calculate: "toNumber(datum.timestamp)",
+      //   as: "timestamp",
+      // },
     ],
-    layer: [
-      {
-        mark: {
-          type: "area",
-          color: "steelblue",
-          opacity: 0.3,
-        },
-        encoding: {
-          x: {
-            field: "timestamp",
-            type: "temporal",
-            title: "Time",
-          },
-          y: {
-            field: "q1_value",
-            type: "quantitative",
-            title: "Value",
-          },
-          y2: {
-            field: "q3_value",
-          },
-        },
+    mark: "line",
+    encoding: {
+      x: {
+        field: "timestamp",
+        type: "temporal",
+        title: "Time",
       },
-      {
-        // Mean line (solid)
-        mark: {
-          type: "line",
-          tooltip: true,
-        },
-        encoding: {
-          x: {
-            field: "timestamp",
-            type: "temporal",
-            title: "Time",
-          },
-          y: {
-            field: "value",
-            type: "quantitative",
-          },
-          color: {
-            field: "aggregation",
-            type: "nominal",
-            scale: {
-              domain: ["mean_value", "max_value", "min_value"],
-              range: ["steelblue", "steelblue", "steelblue"],
-            },
-          },
-          strokeDash: {
-            field: "aggregation",
-            type: "nominal",
-            scale: {
-              domain: ["max_value", "min_value"],
-              range: [
-                [4, 4],
-                [4, 4],
-              ],
-            },
-          },
-        },
+      y: {
+        field: "value",
+        type: "quantitative",
+        title: "Value",
       },
-    ],
+      color: {
+        field: "variable",
+        type: "nominal",
+        title: "Variables",
+      },
+    },
   };
 
   return <VegaLite spec={spec} className="flex-1" />;

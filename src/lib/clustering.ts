@@ -1,7 +1,7 @@
 /**
  *
  * @param values Each record in the list has a "timestamp" value and further values.
- * @param groups The length of the return array
+ * @param groups The length of the return array.
  * @returns A list of list of records. Each record should have again the timestamp value but the further values should be distributed evenly across the list of records.
  */
 export const clustering = (
@@ -19,12 +19,20 @@ export const clustering = (
     (key) => key !== "timestamp"
   );
 
-  // Calculate how many columns per group (distribute as evenly as possible).
-  const columnsPerGroup = Math.ceil(allColumns.length / groups);
+  // Get the last record (we assume the records are sorted by timestamp).
+  const lastRecord = values[values.length - 1];
 
-  // Create the column groups.
+  // Sort the columns by their values in the last record in descending order.
+  const sortedColumns = allColumns.sort(
+    (a, b) => lastRecord[b] - lastRecord[a]
+  );
+
+  // Calculate how many columns per group (distribute as evenly as possible).
+  const columnsPerGroup = Math.ceil(sortedColumns.length / groups);
+
+  // Create the column groups based on the sorted order.
   const columnGroups = Array.from({ length: groups }, (_, i) =>
-    allColumns.slice(i * columnsPerGroup, (i + 1) * columnsPerGroup)
+    sortedColumns.slice(i * columnsPerGroup, (i + 1) * columnsPerGroup)
   );
 
   // Iterate over each record and split into groups based on the column groups.
