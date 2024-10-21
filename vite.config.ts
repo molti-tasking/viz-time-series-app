@@ -7,6 +7,7 @@ import path from "path";
  * @see https://vitejs.dev/config/
  */
 export default defineConfig({
+  base: "/viz-time-series-app", // Adjust this if deploying to a subdirectory
   plugins: [react(), eslintPlugin()],
   resolve: {
     alias: {
