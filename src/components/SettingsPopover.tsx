@@ -40,15 +40,24 @@ export function SettingsPopover() {
 const scaleSchema = z.object({
   rows: z.coerce.number(),
   columns: z.coerce.number(),
+  streamingInterval: z.coerce.number(),
 });
 
 type ScaleFormSchema = z.infer<typeof scaleSchema>;
 
 const SettingsForm = ({ onClose }: { onClose: () => void }) => {
-  const { dimensions, values, generateData } = useDataContext();
+  const {
+    dimensions,
+    values,
+    streamingInterval,
+    generateData,
+    setStreamingInterval,
+  } = useDataContext();
+
   const defaultValues = {
     rows: values.length,
     columns: dimensions.length,
+    streamingInterval: streamingInterval ?? 0,
   };
   console.log(defaultValues);
   const form = useForm<ScaleFormSchema>({
@@ -57,9 +66,15 @@ const SettingsForm = ({ onClose }: { onClose: () => void }) => {
   });
 
   const onSubmit = async (data: ScaleFormSchema) => {
-    const { rows, columns } = data;
+    const { rows, columns, streamingInterval } = data;
     // We add one column because it's getting sneaked away otherwise. Check implementation in useDataContext to see.
     generateData(rows, columns + 1);
+    if (streamingInterval > 0) {
+      setStreamingInterval(streamingInterval);
+    } else {
+      setStreamingInterval(null);
+    }
+
     onClose();
   };
 
@@ -101,6 +116,27 @@ const SettingsForm = ({ onClose }: { onClose: () => void }) => {
                 </FormControl>
                 <FormDescription>
                   This is the amount of parallel time series.
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="streamingInterval"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Streaming Interval (ms)</FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    placeholder="Streaming Interval"
+                    {...field}
+                  />
+                </FormControl>
+                <FormDescription>
+                  This is the time in milliseconds as in interval in order to
+                  append a new row to the data set.
                 </FormDescription>
                 <FormMessage />
               </FormItem>

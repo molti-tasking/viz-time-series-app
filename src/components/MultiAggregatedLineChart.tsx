@@ -76,7 +76,7 @@ export const MultiAggregatedLineChart = () => {
       {/* </div> */}
       <div className="flex flex-row flex-shrink items-center rounded-sm overflow-hidden">
         {colsAccordingToAggregation.map(([name, styleGroup], index) => (
-          <TooltipProvider>
+          <TooltipProvider key={`${name}-${index}`}>
             <Tooltip>
               <TooltipTrigger asChild>
                 <div
