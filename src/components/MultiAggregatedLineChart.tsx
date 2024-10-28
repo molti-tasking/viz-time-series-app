@@ -15,6 +15,8 @@ import {
   ChartPresentationSettingsPopover,
 } from "./ChartPresentationSettingsPopover";
 
+// TODO: Make this chart mostly recursive in a way that a user sees a subset whenever he selects one of those charts
+
 export const MultiAggregatedLineChart = () => {
   const { values, dimensions } = useDataContext();
   const colors: ClassValue[] = [
@@ -169,7 +171,7 @@ const AggregatedLineChart = ({
         "flex-1",
         className,
         "rounded-sm overflow-hidden",
-        "cursor-pointer hover:shadow-lg transition"
+        "hover:shadow-lg transition"
       )}
     />
   );

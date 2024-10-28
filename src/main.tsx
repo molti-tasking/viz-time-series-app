@@ -13,7 +13,7 @@ import MutliAggregatedLine from "./routes/multi-aggregated-line";
 
 const router = createBrowserRouter([
   {
-    path: "/",
+    path: "/viz-time-series-app",
     element: <Root />,
     errorElement: <ErrorPage />,
 
