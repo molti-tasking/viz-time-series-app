@@ -1,4 +1,4 @@
-import { SettingsPopover } from "@/components/SettingsPopover";
+import { DataSettingsPopover } from "@/components/DataSettingsPopover";
 import { Link, Outlet } from "react-router-dom";
 
 export default function Root() {
@@ -32,7 +32,7 @@ export default function Root() {
             ))}
           </div>
           <div className="flex-1"></div>
-          <SettingsPopover />
+          <DataSettingsPopover />
         </div>
       </nav>
       <div className="h-full w-full flex flex-1">

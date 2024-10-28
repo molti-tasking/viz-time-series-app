@@ -21,7 +21,7 @@ import {
 import { Input } from "./ui/input";
 import { useState } from "react";
 
-export function SettingsPopover() {
+export function DataSettingsPopover() {
   const [open, setOpen] = useState(false);
   return (
     <Popover open={open} onOpenChange={setOpen}>

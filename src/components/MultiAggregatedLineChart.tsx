@@ -1,7 +1,6 @@
 import { VegaLite, type VisualizationSpec } from "react-vega";
 import { useDataContext } from "./RawDataContext";
 import { clustering } from "@/lib/clustering";
-import { Input } from "./ui/input";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { type ClassValue } from "clsx";
@@ -11,6 +10,10 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "./ui/tooltip";
+import {
+  type ChartPresentationSettings,
+  ChartPresentationSettingsPopover,
+} from "./ChartPresentationSettingsPopover";
 
 export const MultiAggregatedLineChart = () => {
   const { values, dimensions } = useDataContext();
@@ -29,8 +32,17 @@ export const MultiAggregatedLineChart = () => {
     "bg-amber-200",
     "bg-sky-200",
   ];
-  const [clusterCount, setClusterCount] = useState(2);
-  const aggregated = clustering(values, clusterCount);
+  const [presentationSettings, setPresentationSettings] =
+    useState<ChartPresentationSettings>({ clusterCount: 2, dataTicks: 30 });
+
+  const { clusterCount, dataTicks } = presentationSettings;
+
+  let dataToBeClustered = values;
+  if (dataTicks) {
+    dataToBeClustered = values.slice(-1 * dataTicks);
+  }
+
+  const aggregated = clustering(dataToBeClustered, clusterCount);
 
   // Dirty code begins
   const colsAccordingToAggregation: [string, number][] = dimensions.map(
@@ -54,15 +66,19 @@ export const MultiAggregatedLineChart = () => {
 
   return (
     <div className="container w-full my-2 flex flex-col flex-wrap gap-2">
-      <div className="flex flex-row gap-4 items-center">
-        <span>Amount of clusters (sorted by last value)</span>
+      <div className="flex flex-row-reverse gap-4 items-center">
+        <ChartPresentationSettingsPopover
+          settings={presentationSettings}
+          setSettings={setPresentationSettings}
+        />
+        {/* <span>Amount of clusters (sorted by last value)</span>
         <div>
           <Input
             value={clusterCount}
             onChange={(event) => setClusterCount(event.target.valueAsNumber)}
             type="number"
           />
-        </div>
+        </div> */}
       </div>
       {/* <div className="w-full my-2 flex flex-row flex-wrap gap-2"> */}
       {aggregated.map((val, index) => (
@@ -112,6 +128,7 @@ const AggregatedLineChart = ({
     width: "container",
     height: "container",
     background: "transparent",
+
     data: {
       values,
     },
@@ -120,14 +137,6 @@ const AggregatedLineChart = ({
         fold: dimensions,
         as: ["variable", "value"],
       },
-      // {
-      //   calculate: "toNumber(datum.value)",
-      //   as: "value",
-      // },
-      // {
-      //   calculate: "toNumber(datum.timestamp)",
-      //   as: "timestamp",
-      // },
     ],
     mark: "line",
     encoding: {
@@ -155,7 +164,13 @@ const AggregatedLineChart = ({
   return (
     <VegaLite
       spec={spec}
-      className={cn("flex-1", className, " rounded-sm overflow-hidden")}
+      style={{ cursor: "pointer" }}
+      className={cn(
+        "flex-1",
+        className,
+        "rounded-sm overflow-hidden",
+        "cursor-pointer hover:shadow-lg transition"
+      )}
     />
   );
 };
