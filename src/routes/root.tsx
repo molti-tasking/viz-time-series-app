@@ -3,11 +3,11 @@ import { Link, Outlet } from "react-router-dom";
 
 export default function Root() {
   const routes = [
-    { title: "Home", href: "/" },
-    { title: "Anu Multi Line", href: "/anu" },
-    { title: "2D Multi Line", href: "/multi-line" },
-    { title: "2D Aggregated", href: "/aggregated-line" },
-    { title: "2D Multi Aggregated", href: "/multi-aggregated-line" },
+    { title: "Home", href: "" },
+    { title: "Anu Multi Line", href: "anu" },
+    { title: "2D Multi Line", href: "multi-line" },
+    { title: "2D Aggregated", href: "aggregated-line" },
+    { title: "2D Multi Aggregated", href: "multi-aggregated-line" },
   ];
 
   return (
