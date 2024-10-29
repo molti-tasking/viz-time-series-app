@@ -157,9 +157,6 @@ const clustering = (
 /**
  * DBSCAN-based clustering function to group data points based on density.
  *
- * @param values A list of multivariate time series entries of type Record<string, number>[] where each record contains multiple columns (e.g., time series values).
- * @param eps The maximum distance for clustering data points.
- * @returns A 2D array where each sub-array represents a cluster of points.
  */
 const clusteringDBSCAN = (
   values: [string, Record<number, number>][],
