@@ -52,6 +52,11 @@ export const aggregator = (
       allTimeSeries,
       settings.eps
     );
+    const clusterNames = clusters
+      .flatMap((entry) => entry.flatMap(([entry]) => entry))
+      .sort();
+
+    console.log("Cluster ids:", clusterNames);
 
     // We have to bring these column grouped clusters now again in the structure that they are grouped by column. This way they are required in order to be displayed properly
     aggregated = clusters.map((cluster) => {
@@ -163,6 +168,7 @@ const clusteringDBSCAN = (
   const clusters: [string, Record<number, number>][][] = [];
 
   const visited = new Array(values.length).fill(false);
+  const clustered = new Array(values.length).fill(false); // Track if a point is already in a cluster
 
   // Euclidean distance calculation
   const calculateDistance = (
@@ -196,7 +202,9 @@ const clusteringDBSCAN = (
     pointIndex: number,
     neighbors: number[]
   ): void => {
+    // Add point to cluster and mark it as clustered
     cluster.push(values[pointIndex]);
+    clustered[pointIndex] = true;
 
     for (let i = 0; i < neighbors.length; i++) {
       const neighborIndex = neighbors[i];
@@ -211,21 +219,25 @@ const clusteringDBSCAN = (
         }
       }
 
-      if (!cluster.some((p) => p === values[neighborIndex])) {
+      // Add to cluster only if not already in a cluster
+      if (!clustered[neighborIndex]) {
         cluster.push(values[neighborIndex]);
+        clustered[neighborIndex] = true; // Mark as clustered
       }
     }
   };
 
   for (let i = 0; i < values.length; i++) {
-    if (visited[i]) continue;
+    if (visited[i] || clustered[i]) continue; // Skip if visited or already in a cluster
 
     visited[i] = true;
     const neighbors = getNeighbors(i);
 
     const cluster: [string, Record<number, number>][] = [];
     expandCluster(cluster, i, neighbors);
-    clusters.push(cluster);
+
+    // Only add non-empty clusters
+    if (cluster.length > 0) clusters.push(cluster);
   }
 
   return clusters;
