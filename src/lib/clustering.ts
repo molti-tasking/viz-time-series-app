@@ -30,16 +30,21 @@ type AggregatedProps = {
  * @returns
  */
 export const aggregator = (
-  values: Record<string, number>[],
+  rawData: Record<string, number>[],
   dimensions: string[],
   settings: ChartPresentationSettings
 ): AggregatedProps => {
-  let aggregated: Record<string, number>[][] = [values];
+  let dataToBeClustered = rawData;
+  if (settings.dataTicks) {
+    dataToBeClustered = rawData.slice(-1 * settings.dataTicks);
+  }
+
+  let aggregated: Record<string, number>[][] = [dataToBeClustered];
   if ("eps" in settings && !!settings.eps) {
     // Here we are first putting all the different entries that are grouped by timestamp into another representation which is grouped by column. This way it will be easier to calculate a distance between those later on.
     const allTimeSeries: [string, Record<number, number>][] = dimensions.map(
       (dimension) => {
-        const timeSeries = values.reduce(
+        const timeSeries = dataToBeClustered.reduce(
           (prev, curr) => ({ ...prev, [curr.timestamp]: curr[dimension] }),
           {}
         );
@@ -52,11 +57,13 @@ export const aggregator = (
       allTimeSeries,
       settings.eps
     );
-    const clusterNames = clusters
-      .flatMap((entry) => entry.flatMap(([entry]) => entry))
-      .sort();
+    const timelineNames = clusters.flatMap((entry) =>
+      entry.flatMap(([entry]) => entry)
+    );
 
-    console.log("Cluster ids:", clusterNames);
+    if (timelineNames.length !== dimensions.length) {
+      alert("Somehow we have missing timelines");
+    }
 
     // We have to bring these column grouped clusters now again in the structure that they are grouped by column. This way they are required in order to be displayed properly
     aggregated = clusters.map((cluster) => {
@@ -74,7 +81,7 @@ export const aggregator = (
       });
     });
   } else if ("clusterCount" in settings && !!settings.clusterCount) {
-    aggregated = clustering(values, settings.clusterCount);
+    aggregated = clustering(dataToBeClustered, settings.clusterCount);
   }
 
   const colsAccordingToAggregation: [string, number][] = dimensions.map(
@@ -85,7 +92,7 @@ export const aggregator = (
   );
 
   // Calculate the shared y-axis domain across all clusters
-  const allValues = values.flatMap((entries) =>
+  const allValues = dataToBeClustered.flatMap((entries) =>
     Object.entries(entries).flatMap(([key, value]) =>
       key === "timestamp" ? [] : [value]
     )
