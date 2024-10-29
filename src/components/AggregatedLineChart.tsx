@@ -26,31 +26,11 @@ export const AggregatedLineChart = () => {
       },
       {
         aggregate: [
-          {
-            op: "mean",
-            field: "value",
-            as: "mean_value",
-          },
-          {
-            op: "max",
-            field: "value",
-            as: "max_value",
-          },
-          {
-            op: "min",
-            field: "value",
-            as: "min_value",
-          },
-          {
-            op: "q1",
-            field: "value",
-            as: "q1_value",
-          },
-          {
-            op: "q3",
-            field: "value",
-            as: "q3_value",
-          },
+          { op: "mean", field: "value", as: "mean_value" },
+          { op: "max", field: "value", as: "max_value" },
+          { op: "min", field: "value", as: "min_value" },
+          { op: "q1", field: "value", as: "q1_value" },
+          { op: "q3", field: "value", as: "q3_value" },
         ],
         groupby: ["timestamp"],
       },

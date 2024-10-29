@@ -1,4 +1,6 @@
+"use client";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Popover,
   PopoverContent,
@@ -9,16 +11,7 @@ import { Input } from "./ui/input";
 import React, { useState } from "react";
 import { Label } from "./ui/label";
 import { cn } from "@/lib/utils";
-
-export interface ChartPresentationSettings {
-  clusterCount: number;
-  dataTicks?: number;
-
-  timeScale?: {
-    from?: number;
-    to?: number;
-  };
-}
+import { ChartPresentationSettings } from "@/lib/clustering";
 
 interface ChartPresentationSettingsPopoverProps {
   settings: ChartPresentationSettings;
@@ -36,7 +29,7 @@ export function ChartPresentationSettingsPopover(
           <ChevronDownIcon /> Configure Presentation
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-80">
+      <PopoverContent className="w-96">
         <ChartPresentationSettingsForm
           onClose={() => setOpen(false)}
           {...props}
@@ -45,6 +38,12 @@ export function ChartPresentationSettingsPopover(
     </Popover>
   );
 }
+
+const chartViewOptions: Record<ChartPresentationSettings["mode"], string> = {
+  multiline: "Multiline",
+  envelope: "Envelope",
+  horizon: "Horizon (tbd.)",
+};
 
 const ChartPresentationSettingsForm = ({
   onClose,
@@ -65,16 +64,40 @@ const ChartPresentationSettingsForm = ({
       </div>
 
       <div className="grid w-full max-w-sm items-center gap-1.5">
+        <Label htmlFor="clusterCount">Cart View Mode</Label>
+        <Tabs
+          value={settings.mode}
+          onValueChange={(mode) =>
+            setSettings((curr) => ({
+              ...curr,
+              mode: mode as ChartPresentationSettings["mode"],
+            }))
+          }
+        >
+          <TabsList>
+            {Object.entries(chartViewOptions).map(([key, label]) => (
+              <TabsTrigger value={key} key={key}>
+                {label}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+          <TabsContent value="horizon">
+            This view is not implemented yet.
+          </TabsContent>
+        </Tabs>
+      </div>
+
+      <div className="grid w-full max-w-sm items-center gap-1.5">
         <Label htmlFor="clusterCount">Cluster Count</Label>
         <Input
           type="number"
           id="clusterCount"
           placeholder="Cluster Count"
-          value={settings.clusterCount}
+          value={"clusterCount" in settings ? settings.clusterCount : undefined}
           onChange={(e) =>
             setSettings((curr) => ({
               ...curr,
-              clusterCount: e.target.valueAsNumber ?? curr.clusterCount,
+              clusterCount: e.target.valueAsNumber ?? undefined,
             }))
           }
         />
