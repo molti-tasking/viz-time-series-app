@@ -6,7 +6,7 @@ export type ChartPresentationSettings = (
       /**
        * A number between 0 and 1 to be used as a percentage and based on it there will be different clusters created, but the resulting cluster count will be unknown
        */
-      clusterThreshold: number;
+      eps: number;
     }
 ) & {
   mode: "multiline" | "envelope" | "horizon";
@@ -34,17 +34,43 @@ export const aggregator = (
   dimensions: string[],
   settings: ChartPresentationSettings
 ): AggregatedProps => {
-  let clusterCount = 1;
-  if ("clusterCount" in settings) {
-    clusterCount = settings.clusterCount;
-  }
+  let aggregated: Record<string, number>[][] = [values];
+  if ("eps" in settings && !!settings.eps) {
+    // Here we are first putting all the different entries that are grouped by timestamp into another representation which is grouped by column. This way it will be easier to calculate a distance between those later on.
+    const allTimeSeries: [string, Record<number, number>][] = dimensions.map(
+      (dimension) => {
+        const timeSeries = values.reduce(
+          (prev, curr) => ({ ...prev, [curr.timestamp]: curr[dimension] }),
+          {}
+        );
+        return [dimension, timeSeries];
+      }
+    );
 
-  let dataToBeClustered = values;
-  if (settings.dataTicks) {
-    dataToBeClustered = values.slice(-1 * settings.dataTicks);
-  }
+    // We let the clustering algorithm do the magic and return us the clusters.
+    const clusters: [string, Record<number, number>][][] = clusteringDBSCAN(
+      allTimeSeries,
+      settings.eps
+    );
 
-  const aggregated = clustering(dataToBeClustered, clusterCount);
+    // We have to bring these column grouped clusters now again in the structure that they are grouped by column. This way they are required in order to be displayed properly
+    aggregated = clusters.map((cluster) => {
+      const timestamps = Object.keys(cluster[0][1]);
+      return timestamps.map((timestamp) => {
+        return cluster.reduce(
+          (prev, [colName, values]) => ({
+            ...prev,
+            [colName]: values[Number(timestamp)],
+          }),
+          {
+            timestamp: Number(timestamp),
+          }
+        );
+      });
+    });
+  } else if ("clusterCount" in settings && !!settings.clusterCount) {
+    aggregated = clustering(values, settings.clusterCount);
+  }
 
   const colsAccordingToAggregation: [string, number][] = dimensions.map(
     (val) => [
@@ -121,4 +147,86 @@ const clustering = (
   });
 
   return res;
+};
+
+/**
+ * DBSCAN-based clustering function to group data points based on density.
+ *
+ * @param values A list of multivariate time series entries of type Record<string, number>[] where each record contains multiple columns (e.g., time series values).
+ * @param eps The maximum distance for clustering data points.
+ * @returns A 2D array where each sub-array represents a cluster of points.
+ */
+const clusteringDBSCAN = (
+  values: [string, Record<number, number>][],
+  eps: number
+): [string, Record<number, number>][][] => {
+  const clusters: [string, Record<number, number>][][] = [];
+
+  const visited = new Array(values.length).fill(false);
+
+  // Euclidean distance calculation
+  const calculateDistance = (
+    pointA: [string, Record<number, number>],
+    pointB: [string, Record<number, number>]
+  ): number => {
+    let sum = 0;
+    for (const entry in pointA[1]) {
+      sum += (pointA[1][Number(entry)] - pointB[1][Number(entry)]) ** 2;
+    }
+    return Math.sqrt(sum);
+  };
+
+  // Find all neighbors within eps distance
+  const getNeighbors = (pointIndex: number): number[] => {
+    const neighbors: number[] = [];
+    for (let i = 0; i < values.length; i++) {
+      if (
+        i !== pointIndex &&
+        calculateDistance(values[pointIndex], values[i]) <= eps
+      ) {
+        neighbors.push(i);
+      }
+    }
+    return neighbors;
+  };
+
+  // Recursive function to expand cluster
+  const expandCluster = (
+    cluster: [string, Record<number, number>][],
+    pointIndex: number,
+    neighbors: number[]
+  ): void => {
+    cluster.push(values[pointIndex]);
+
+    for (let i = 0; i < neighbors.length; i++) {
+      const neighborIndex = neighbors[i];
+
+      if (!visited[neighborIndex]) {
+        visited[neighborIndex] = true;
+        const newNeighbors = getNeighbors(neighborIndex);
+
+        if (newNeighbors.length >= eps) {
+          // Use eps as minPoints-like threshold for neighbors
+          neighbors.push(...newNeighbors);
+        }
+      }
+
+      if (!cluster.some((p) => p === values[neighborIndex])) {
+        cluster.push(values[neighborIndex]);
+      }
+    }
+  };
+
+  for (let i = 0; i < values.length; i++) {
+    if (visited[i]) continue;
+
+    visited[i] = true;
+    const neighbors = getNeighbors(i);
+
+    const cluster: [string, Record<number, number>][] = [];
+    expandCluster(cluster, i, neighbors);
+    clusters.push(cluster);
+  }
+
+  return clusters;
 };

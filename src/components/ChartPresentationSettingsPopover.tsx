@@ -53,7 +53,7 @@ const ChartPresentationSettingsForm = ({
   onClose: () => void;
 } & ChartPresentationSettingsPopoverProps) => {
   return (
-    <div className="grid gap-4">
+    <div className="grid gap-8">
       <div className="space-y-2">
         <h4 className="text-lg font-medium leading-none">
           Data Presetation Settings
@@ -87,23 +87,53 @@ const ChartPresentationSettingsForm = ({
         </Tabs>
       </div>
 
-      <div className="grid w-full max-w-sm items-center gap-1.5">
-        <Label htmlFor="clusterCount">Cluster Count</Label>
-        <Input
-          type="number"
-          id="clusterCount"
-          placeholder="Cluster Count"
-          value={"clusterCount" in settings ? settings.clusterCount : undefined}
-          onChange={(e) =>
-            setSettings((curr) => ({
-              ...curr,
-              clusterCount: e.target.valueAsNumber ?? undefined,
-            }))
-          }
-        />
-        <p className={cn("text-sm text-muted-foreground")}>
-          Define the amount of different charts the date should be grouped into.
-        </p>
+      <div className="grid w-full grid-cols-2 gap-2 items-start">
+        <div className="grid w-full max-w-sm items-center gap-1.5">
+          <Label htmlFor="clusterCount">Cluster Count</Label>
+          <Input
+            type="number"
+            id="clusterCount"
+            placeholder="Cluster Count"
+            disabled={"eps" in settings && !!settings.eps}
+            value={
+              "clusterCount" in settings ? settings.clusterCount : undefined
+            }
+            onChange={(e) =>
+              setSettings((curr) => ({
+                ...curr,
+                eps: undefined,
+                clusterCount: e.target.valueAsNumber ?? undefined,
+              }))
+            }
+          />
+          <p className={cn("text-sm text-muted-foreground")}>
+            Define the amount of different charts the date should be grouped
+            into.
+          </p>
+        </div>
+
+        <div className="grid w-full max-w-sm items-center gap-1.5">
+          <Label htmlFor="similarityThreshold">Similarity Threshold</Label>
+          <Input
+            type="number"
+            id="similarityThreshold"
+            placeholder="Similarity Threshold"
+            step={0.1}
+            disabled={"clusterCount" in settings && !!settings.clusterCount}
+            value={"eps" in settings ? settings.eps : undefined}
+            onChange={(e) =>
+              setSettings((curr) => ({
+                ...curr,
+                clusterCount: undefined,
+                eps: e.target.valueAsNumber ?? undefined,
+              }))
+            }
+          />
+          <p className={cn("text-sm text-muted-foreground")}>
+            Define the threshold of how similar one cluster should be. The
+            smaller the value, the more clusters you will have.
+          </p>
+        </div>
       </div>
 
       <div className="grid w-full max-w-sm items-center gap-1.5">
