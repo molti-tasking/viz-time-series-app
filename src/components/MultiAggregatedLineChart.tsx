@@ -1,6 +1,6 @@
 import { VegaLite, type VisualizationSpec } from "react-vega";
 import { useDataContext } from "./RawDataContext";
-import { clustering } from "@/lib/clustering";
+import { aggregator } from "@/lib/clustering";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { type ClassValue } from "clsx";
@@ -37,34 +37,11 @@ export const MultiAggregatedLineChart = () => {
   const [presentationSettings, setPresentationSettings] =
     useState<ChartPresentationSettings>({ clusterCount: 2, dataTicks: 30 });
 
-  const { clusterCount, dataTicks } = presentationSettings;
-
-  let dataToBeClustered = values;
-  if (dataTicks) {
-    dataToBeClustered = values.slice(-1 * dataTicks);
-  }
-
-  const aggregated = clustering(dataToBeClustered, clusterCount);
-
-  // Dirty code begins
-  const colsAccordingToAggregation: [string, number][] = dimensions.map(
-    (val) => [
-      val,
-      aggregated.findIndex((entries) => Object.keys(entries[0]).includes(val)),
-    ]
+  const { aggregated, colsAccordingToAggregation, yDomain } = aggregator(
+    values,
+    dimensions,
+    presentationSettings
   );
-
-  // Calculate the shared y-axis domain across all clusters
-  const allValues = values.flatMap((entries) =>
-    Object.entries(entries).flatMap(([key, value]) =>
-      key === "timestamp" ? [] : [value]
-    )
-  );
-  const yMin = Math.min(...allValues);
-  const yMax = Math.max(...allValues);
-  const yDomain: [number, number] = [yMin, yMax];
-
-  // Dirty code ends (Hopefully)
 
   return (
     <div className="container w-full my-2 flex flex-col flex-wrap gap-2">
@@ -87,7 +64,7 @@ export const MultiAggregatedLineChart = () => {
         <AggregatedLineChart
           values={val}
           key={index}
-          className={colors[index]}
+          className={colors[index % colors.length]}
           yDomain={yDomain}
         />
       ))}
@@ -99,7 +76,7 @@ export const MultiAggregatedLineChart = () => {
               <TooltipTrigger asChild>
                 <div
                   className={cn(
-                    colors[styleGroup],
+                    colors[styleGroup % colors.length],
                     "flex-1 h-4",
                     index > 0 ? "border-l-[0.5px]" : ""
                   )}

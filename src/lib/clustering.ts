@@ -1,3 +1,46 @@
+import { type ChartPresentationSettings } from "@/components/ChartPresentationSettingsPopover";
+
+type AggregatedProps = {
+  aggregated: Record<string, number>[][];
+  yDomain: [number, number];
+  colsAccordingToAggregation: [string, number][];
+};
+
+export const aggregator = (
+  values: Record<string, number>[],
+  dimensions: string[],
+  settings: ChartPresentationSettings
+): AggregatedProps => {
+  const { clusterCount, dataTicks } = settings;
+
+  let dataToBeClustered = values;
+  if (dataTicks) {
+    dataToBeClustered = values.slice(-1 * dataTicks);
+  }
+
+  const aggregated = clustering(dataToBeClustered, clusterCount);
+
+  // Dirty code begins
+  const colsAccordingToAggregation: [string, number][] = dimensions.map(
+    (val) => [
+      val,
+      aggregated.findIndex((entries) => Object.keys(entries[0]).includes(val)),
+    ]
+  );
+
+  // Calculate the shared y-axis domain across all clusters
+  const allValues = values.flatMap((entries) =>
+    Object.entries(entries).flatMap(([key, value]) =>
+      key === "timestamp" ? [] : [value]
+    )
+  );
+  const yMin = Math.min(...allValues);
+  const yMax = Math.max(...allValues);
+  const yDomain: [number, number] = [yMin, yMax];
+
+  return { aggregated, yDomain, colsAccordingToAggregation };
+};
+
 /**
  *
  * @param values Each record in the list has a "timestamp" value and further values.
