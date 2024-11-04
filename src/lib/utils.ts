@@ -6,18 +6,17 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function deepMerge(
-  obj1: Record<string, unknown>,
-  obj2: Record<string, unknown>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  obj1: Record<string, any>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  obj2: Record<string, any>
 ) {
   const result = { ...obj1 };
   for (const key in obj2) {
     if (Array.isArray(obj2[key]) && Array.isArray(obj1[key])) {
       result[key] = obj1[key].concat(obj2[key]);
     } else if (obj2[key] instanceof Object && key in obj1) {
-      result[key] = deepMerge(
-        obj1[key] as Record<string, unknown>,
-        obj2[key] as Record<string, unknown>
-      );
+      result[key] = deepMerge(obj1[key], obj2[key]);
     } else {
       result[key] = obj2[key];
     }

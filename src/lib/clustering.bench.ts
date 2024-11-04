@@ -437,6 +437,7 @@ const presentationSettings = {
   eps: 15,
 };
 
+// @ts-expect-error Deno has to be installed locally
 Deno.bench({
   name: "benchmark current aggregation function",
   fn() {
@@ -444,6 +445,7 @@ Deno.bench({
   },
 });
 
+// @ts-expect-error Deno has to be installed locally
 Deno.bench({
   name: "benchmark current aggregation function",
   fn() {

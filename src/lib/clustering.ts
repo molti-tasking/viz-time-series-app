@@ -34,6 +34,7 @@ export const aggregator = (
   dimensions: string[],
   settings: ChartPresentationSettings
 ): AggregatedProps => {
+  console.count("Called aggregator");
   let dataToBeClustered = rawData;
   if (settings.dataTicks) {
     dataToBeClustered = rawData.slice(-1 * settings.dataTicks);
