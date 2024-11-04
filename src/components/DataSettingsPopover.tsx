@@ -1,15 +1,5 @@
 import { Button } from "@/components/ui/button";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { ChevronDownIcon } from "lucide-react";
-import { useDataContext } from "./RawDataContext";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import {
   Form,
   FormControl,
   FormDescription,
@@ -18,8 +8,18 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "./ui/input";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ChevronDownIcon } from "lucide-react";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { useDataContext } from "./RawDataContext";
+import { Input } from "./ui/input";
 
 export function DataSettingsPopover() {
   const [open, setOpen] = useState(false);
@@ -91,22 +91,6 @@ const SettingsForm = ({ onClose }: { onClose: () => void }) => {
 
           <FormField
             control={form.control}
-            name="rows"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Rows</FormLabel>
-                <FormControl>
-                  <Input type="number" placeholder="shadcn" {...field} />
-                </FormControl>
-                <FormDescription>
-                  This is the amount of timestamps for each time series
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
             name="columns"
             render={({ field }) => (
               <FormItem>
@@ -116,6 +100,22 @@ const SettingsForm = ({ onClose }: { onClose: () => void }) => {
                 </FormControl>
                 <FormDescription>
                   This is the amount of parallel time series.
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="rows"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Rows</FormLabel>
+                <FormControl>
+                  <Input type="number" placeholder="Rows" {...field} />
+                </FormControl>
+                <FormDescription>
+                  This is the amount of timestamps for each time series
                 </FormDescription>
                 <FormMessage />
               </FormItem>
