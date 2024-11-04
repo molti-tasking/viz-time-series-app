@@ -1,16 +1,16 @@
-import { VegaLite, type VisualizationSpec } from "react-vega";
-import { useDataContext } from "./RawDataContext";
 import { type ChartPresentationSettings, aggregator } from "@/lib/clustering";
-import { useState } from "react";
 import { cn, deepMerge } from "@/lib/utils";
 import { type ClassValue } from "clsx";
+import { useState } from "react";
+import { VegaLite, type VisualizationSpec } from "react-vega";
+import { ChartPresentationSettingsPopover } from "./ChartPresentationSettingsPopover";
+import { useDataContext } from "./RawDataContext";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "./ui/tooltip";
-import { ChartPresentationSettingsPopover } from "./ChartPresentationSettingsPopover";
 
 const chartModeSpecs: Record<
   ChartPresentationSettings["mode"],
