@@ -2,7 +2,7 @@
 import { expect, test } from "vitest";
 import { wrapper } from "./wrapping.ts";
 
-test("Test wrapping on a one dimensional array", () => {
+test("Test wrapping on a one dimensional array with a range of 3 data points", () => {
   const input = [
     { timestamp: 1729526263058, "Col 1": 100 },
     { timestamp: 1729526264058, "Col 1": 101 },
@@ -38,7 +38,55 @@ test("Test wrapping on a one dimensional array", () => {
   ];
 
   // Act
-  const { filteredData } = wrapper(input, ["Col 1"], { eps: 0.2 });
+  const { filteredData } = wrapper(input, ["Col 1"], {
+    meanRange: 0.2,
+    tickRange: 3,
+  });
+
+  // Assert
+  expect(filteredData).toStrictEqual(expectedResult);
+});
+
+test("Test wrapping on a one dimensional array with a range of 5 data points", () => {
+  const input = [
+    { timestamp: 1729526263058, "Col 1": 100 },
+    { timestamp: 1729526264058, "Col 1": 101 },
+    { timestamp: 1729526265058, "Col 1": 102 },
+    { timestamp: 1729526266058, "Col 1": 103 },
+    { timestamp: 1729526267058, "Col 1": 104 },
+    { timestamp: 1729526268058, "Col 1": 103 },
+    { timestamp: 1729526269058, "Col 1": 102 },
+    { timestamp: 1729526270058, "Col 1": 139 },
+    { timestamp: 1729526271058, "Col 1": 141 },
+    { timestamp: 1729526272058, "Col 1": 140 },
+    { timestamp: 1729526273058, "Col 1": 139 },
+    { timestamp: 1729526274058, "Col 1": 102 },
+    { timestamp: 1729526275058, "Col 1": 101 },
+    { timestamp: 1729526276058, "Col 1": 103 },
+  ];
+
+  const expectedResult = [
+    { timestamp: 1729526263058, "Col 1": 100 },
+    { timestamp: 1729526264058, "Col 1": 101 },
+    { timestamp: 1729526265058, "Col 1": undefined },
+    { timestamp: 1729526266058, "Col 1": undefined },
+    { timestamp: 1729526267058, "Col 1": undefined },
+    { timestamp: 1729526268058, "Col 1": 103 },
+    { timestamp: 1729526269058, "Col 1": 102 },
+    { timestamp: 1729526270058, "Col 1": 139 },
+    { timestamp: 1729526271058, "Col 1": 141 },
+    { timestamp: 1729526272058, "Col 1": 140 },
+    { timestamp: 1729526273058, "Col 1": 139 },
+    { timestamp: 1729526274058, "Col 1": 102 },
+    { timestamp: 1729526275058, "Col 1": 101 },
+    { timestamp: 1729526276058, "Col 1": 103 },
+  ];
+
+  // Act
+  const { filteredData } = wrapper(input, ["Col 1"], {
+    meanRange: 0.2,
+    tickRange: 5,
+  });
 
   // Assert
   expect(filteredData).toStrictEqual(expectedResult);
