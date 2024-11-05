@@ -1,15 +1,16 @@
 import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
-import "./index.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import Root from "./routes/root";
+import { HorizontalWrappedLineChart } from "./components/HorizontalWrappedLineChart";
+import { RawDataContextProvider } from "./components/RawDataContext";
 import ErrorPage from "./error-page";
+import "./index.css";
+import AggrLine from "./routes/aggregated-line";
 import Anu from "./routes/anu";
 import Home from "./routes/home";
-import MultiLine from "./routes/multi-line";
-import AggrLine from "./routes/aggregated-line";
-import { RawDataContextProvider } from "./components/RawDataContext";
 import MutliAggregatedLine from "./routes/multi-aggregated-line";
+import MultiLine from "./routes/multi-line";
+import Root from "./routes/root";
 
 const router = createBrowserRouter([
   {
@@ -33,6 +34,11 @@ const router = createBrowserRouter([
       {
         path: "multi-aggregated-line",
         element: <MutliAggregatedLine />,
+        errorElement: <ErrorPage />,
+      },
+      {
+        path: "wrapped-line",
+        element: <HorizontalWrappedLineChart />,
         errorElement: <ErrorPage />,
       },
     ],
