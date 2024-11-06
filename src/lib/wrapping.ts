@@ -1,4 +1,4 @@
-export type ChartWrappingSettings = {
+export type DataCompressionPreferences = {
   /**
    * This value is a threshold. Whenever one of the values of a given range is outside of the a relative range apart from the mean, it will be considered as significant. Should be a number between 0 and 1.
    *
@@ -9,13 +9,13 @@ export type ChartWrappingSettings = {
    * @default 3
    */
   tickRange: number;
-  mode?: "multiline" | "envelope";
+  mode: "multiline" | "envelope";
 };
 
 export const wrapper = (
   rawData: Record<string, number>[],
   dimensions: string[],
-  settings: ChartWrappingSettings
+  settings: DataCompressionPreferences
 ) => {
   console.count("Called wrapper");
   const totalTickRange = Math.floor(settings.tickRange) ?? 3;

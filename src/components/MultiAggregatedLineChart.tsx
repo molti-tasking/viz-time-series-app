@@ -1,11 +1,11 @@
-import { type ChartPresentationSettings } from "@/lib/clustering";
+import { type ClusterChartPreferences } from "@/lib/clustering";
 import { aggregatorB } from "@/lib/clusteringB";
 import { cn, deepMerge } from "@/lib/utils";
 import { useDataStore } from "@/store/dataStore";
 import { type ClassValue } from "clsx";
 import { useState } from "react";
 import { VegaLite, type VisualizationSpec } from "react-vega";
-import { ChartPresentationSettingsPopover } from "./ChartPresentationSettingsPopover";
+import { ClusterChartPreferencesPopover } from "./ClusterChartPreferencesPopover";
 import {
   Tooltip,
   TooltipContent,
@@ -14,7 +14,7 @@ import {
 } from "./ui/tooltip";
 
 const chartModeSpecs: Record<
-  ChartPresentationSettings["mode"],
+  ClusterChartPreferences["mode"],
   Partial<VisualizationSpec>
 > = {
   multiline: {
@@ -138,7 +138,7 @@ export const MultiAggregatedLineChart = () => {
     "bg-sky-200",
   ];
   const [presentationSettings, setPresentationSettings] =
-    useState<ChartPresentationSettings>({
+    useState<ClusterChartPreferences>({
       clusterCount: 2,
       dataTicks: 30,
       mode: "envelope",
@@ -153,7 +153,7 @@ export const MultiAggregatedLineChart = () => {
   return (
     <div className="container w-full my-2 flex flex-col flex-wrap gap-2">
       <div className="flex flex-row-reverse gap-4 items-center">
-        <ChartPresentationSettingsPopover
+        <ClusterChartPreferencesPopover
           settings={presentationSettings}
           setSettings={setPresentationSettings}
         />
@@ -207,7 +207,7 @@ const AggregatedLineChart = ({
   values: Record<string, number>[];
   className: ClassValue;
   yDomain: [number, number];
-  mode: ChartPresentationSettings["mode"];
+  mode: ClusterChartPreferences["mode"];
 }) => {
   const dimensions = values.length
     ? Object.keys(values[0]).filter((e) => e !== "timestamp")

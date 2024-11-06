@@ -1,4 +1,4 @@
-export type ChartPresentationSettings = (
+export type ClusterChartPreferences = (
   | {
       clusterCount: number;
     }
@@ -32,7 +32,7 @@ type AggregatedProps = {
 export const aggregator = (
   rawData: Record<string, number>[],
   dimensions: string[],
-  settings: ChartPresentationSettings
+  settings: ClusterChartPreferences
 ): AggregatedProps => {
   console.count("Called aggregator");
   let dataToBeClustered = rawData;

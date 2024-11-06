@@ -1,13 +1,13 @@
-import { type ChartPresentationSettings } from "@/lib/clustering";
 import { cn, deepMerge } from "@/lib/utils";
-import { ChartWrappingSettings, wrapper } from "@/lib/wrapping";
+import { type DataCompressionPreferences, wrapper } from "@/lib/wrapping";
 import { useDataStore } from "@/store/dataStore";
 import { type ClassValue } from "clsx";
 import { useState } from "react";
 import { VegaLite, type VisualizationSpec } from "react-vega";
+import { DataCompressionPreferencesPopover } from "./DataCompressionPreferencesPopover";
 
 const chartModeSpecs: Record<
-  ChartPresentationSettings["mode"],
+  DataCompressionPreferences["mode"],
   Partial<VisualizationSpec>
 > = {
   multiline: {
@@ -106,7 +106,6 @@ const chartModeSpecs: Record<
       },
     ],
   },
-  horizon: {},
 };
 
 // TODO: Make this chart mostly recursive in a way that a user sees a subset whenever he selects one of those charts
@@ -115,24 +114,27 @@ export const HorizontalWrappedLineChart = () => {
   const dimensions = useDataStore((state) => state.dimensions);
   const values = useDataStore((state) => state.values);
 
-  const [presentationSettings] = useState<ChartWrappingSettings>({
-    meanRange: 0.1,
-    tickRange: 8,
-    mode: "multiline",
-  });
+  const [presentationSettings, setPresentationSettings] =
+    useState<DataCompressionPreferences>({
+      meanRange: 0.1,
+      tickRange: 8,
+      mode: "multiline",
+    });
 
   const { filteredData } = wrapper(values, dimensions, presentationSettings);
 
   return (
     <div className="container w-full my-2 flex flex-col flex-wrap gap-2">
       <div className="flex flex-row-reverse gap-4 items-center">
-        {/* <ChartPresentationSettingsPopover
+        <DataCompressionPreferencesPopover
           settings={presentationSettings}
           setSettings={setPresentationSettings}
-        /> */}
-        <div>Make stuff configurable</div>
+        />
       </div>
-      <AggregatedLineChart values={filteredData} mode="multiline" />
+      <AggregatedLineChart
+        values={filteredData}
+        mode={presentationSettings.mode}
+      />
     </div>
   );
 };
@@ -145,7 +147,7 @@ const AggregatedLineChart = ({
   values: Record<string, number | undefined>[];
   className?: ClassValue;
   yDomain?: [number, number];
-  mode: ChartPresentationSettings["mode"];
+  mode: DataCompressionPreferences["mode"];
 }) => {
   const dimensions = values.length
     ? Object.keys(values[0]).filter((e) => e !== "timestamp")

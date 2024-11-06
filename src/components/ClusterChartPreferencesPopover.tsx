@@ -6,20 +6,20 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ChartPresentationSettings } from "@/lib/clustering";
+import { ClusterChartPreferences } from "@/lib/clustering";
 import { cn } from "@/lib/utils";
 import { ChevronDownIcon } from "lucide-react";
 import React, { useState } from "react";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 
-interface ChartPresentationSettingsPopoverProps {
-  settings: ChartPresentationSettings;
-  setSettings: React.Dispatch<React.SetStateAction<ChartPresentationSettings>>;
+interface ClusterChartPreferencesPopoverProps {
+  settings: ClusterChartPreferences;
+  setSettings: React.Dispatch<React.SetStateAction<ClusterChartPreferences>>;
 }
 
-export function ChartPresentationSettingsPopover(
-  props: ChartPresentationSettingsPopoverProps
+export function ClusterChartPreferencesPopover(
+  props: ClusterChartPreferencesPopoverProps
 ) {
   const [open, setOpen] = useState(false);
   return (
@@ -30,47 +30,45 @@ export function ChartPresentationSettingsPopover(
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-96 z-[2000]">
-        <ChartPresentationSettingsForm
-          onClose={() => setOpen(false)}
-          {...props}
-        />
+        <SettingsForm onClose={() => setOpen(false)} {...props} />
       </PopoverContent>
     </Popover>
   );
 }
 
-const chartViewOptions: Record<ChartPresentationSettings["mode"], string> = {
+const chartViewOptions: Record<ClusterChartPreferences["mode"], string> = {
   multiline: "Multiline",
   envelope: "Envelope",
   horizon: "Horizon (tbd.)",
 };
 
-const ChartPresentationSettingsForm = ({
+const SettingsForm = ({
   onClose,
   settings,
   setSettings,
 }: {
   onClose: () => void;
-} & ChartPresentationSettingsPopoverProps) => {
+} & ClusterChartPreferencesPopoverProps) => {
   return (
     <div className="grid gap-8">
       <div className="space-y-2">
         <h4 className="text-lg font-medium leading-none">
-          Data Presetation Settings
+          Data Presentation Settings
         </h4>
         <p className="text-sm text-muted-foreground">
-          Set the disired filters for your data.
+          Set the desired filters for your data.
         </p>
       </div>
 
       <div className="grid w-full max-w-sm items-center gap-1.5">
-        <Label htmlFor="clusterCount">Cart View Mode</Label>
+        <Label htmlFor="chartViewMode">Chart View Mode</Label>
         <Tabs
+          id="chartViewMode"
           value={settings.mode}
           onValueChange={(mode) =>
             setSettings((curr) => ({
               ...curr,
-              mode: mode as ChartPresentationSettings["mode"],
+              mode: mode as ClusterChartPreferences["mode"],
             }))
           }
         >

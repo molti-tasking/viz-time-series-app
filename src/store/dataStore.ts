@@ -126,7 +126,7 @@ const generatePeakTestData = (
           baselineValues[index] += (Math.random() - 0.5) * 0.02;
           return value * (1 + (Math.random() - 0.5) * 0.03);
         });
-        if (Math.random() < 0.1) {
+        if (Math.random() < 0.05) {
           peakActive = true;
           peakDuration = Math.floor(5 + Math.random() * 5);
           randomValues = previousValues.map(
