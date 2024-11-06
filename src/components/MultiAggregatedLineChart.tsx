@@ -1,11 +1,11 @@
 import { type ChartPresentationSettings } from "@/lib/clustering";
 import { aggregatorB } from "@/lib/clusteringB";
 import { cn, deepMerge } from "@/lib/utils";
+import { useDataStore } from "@/store/dataStore";
 import { type ClassValue } from "clsx";
 import { useState } from "react";
 import { VegaLite, type VisualizationSpec } from "react-vega";
 import { ChartPresentationSettingsPopover } from "./ChartPresentationSettingsPopover";
-import { useDataContext } from "./RawDataContext";
 import {
   Tooltip,
   TooltipContent,
@@ -119,7 +119,9 @@ const chartModeSpecs: Record<
 // TODO: Make this chart mostly recursive in a way that a user sees a subset whenever he selects one of those charts
 
 export const MultiAggregatedLineChart = () => {
-  const { values, dimensions } = useDataContext();
+  const dimensions = useDataStore((state) => state.dimensions);
+  const values = useDataStore((state) => state.values);
+
   const colors: ClassValue[] = [
     "bg-red-200",
     "bg-green-200",

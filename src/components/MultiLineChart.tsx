@@ -1,8 +1,9 @@
+import { useDataStore } from "@/store/dataStore";
 import { VegaLite, type VisualizationSpec } from "react-vega";
-import { useDataContext } from "./RawDataContext";
 
 export const MultiLineChart = () => {
-  const { dimensions, values } = useDataContext();
+  const dimensions = useDataStore((state) => state.dimensions);
+  const values = useDataStore((state) => state.values);
 
   const spec: VisualizationSpec = {
     $schema: "https://vega.github.io/schema/vega-lite/v5.json",

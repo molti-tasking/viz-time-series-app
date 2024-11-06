@@ -1,10 +1,10 @@
 import { type ChartPresentationSettings } from "@/lib/clustering";
 import { cn, deepMerge } from "@/lib/utils";
 import { ChartWrappingSettings, wrapper } from "@/lib/wrapping";
+import { useDataStore } from "@/store/dataStore";
 import { type ClassValue } from "clsx";
 import { useState } from "react";
 import { VegaLite, type VisualizationSpec } from "react-vega";
-import { useDataContext } from "./RawDataContext";
 
 const chartModeSpecs: Record<
   ChartPresentationSettings["mode"],
@@ -112,7 +112,8 @@ const chartModeSpecs: Record<
 // TODO: Make this chart mostly recursive in a way that a user sees a subset whenever he selects one of those charts
 
 export const HorizontalWrappedLineChart = () => {
-  const { values, dimensions } = useDataContext();
+  const dimensions = useDataStore((state) => state.dimensions);
+  const values = useDataStore((state) => state.values);
 
   const [presentationSettings] = useState<ChartWrappingSettings>({
     meanRange: 0.1,

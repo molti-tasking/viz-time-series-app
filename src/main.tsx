@@ -2,7 +2,6 @@ import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { HorizontalWrappedLineChart } from "./components/HorizontalWrappedLineChart";
-import { RawDataContextProvider } from "./components/RawDataContext";
 import ErrorPage from "./error-page";
 import "./index.css";
 import AggrLine from "./routes/aggregated-line";
@@ -50,8 +49,6 @@ const root = ReactDOM.createRoot(rootElement);
 
 root.render(
   <StrictMode>
-    <RawDataContextProvider>
-      <RouterProvider router={router} />
-    </RawDataContextProvider>
+    <RouterProvider router={router} />
   </StrictMode>
 );

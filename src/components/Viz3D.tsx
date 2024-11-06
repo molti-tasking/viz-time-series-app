@@ -1,20 +1,20 @@
-import { useEffect, useRef } from "react";
 import {
-  Scene,
-  HemisphericLight,
   ArcRotateCamera,
-  Vector3,
   Color3,
-  Mesh,
   Engine,
   type EngineOptions,
+  HemisphericLight,
+  Mesh,
+  Scene,
   type SceneOptions,
   StandardMaterial,
+  Vector3,
 } from "@babylonjs/core";
+import { useEffect, useRef } from "react";
 // import * as anu from "../../../anu/";
+import { useDataStore } from "@/store/dataStore";
 import * as anu from "@jpmorganchase/anu";
-import { utcFormat, scaleLinear, scalePoint, extent, quantile } from "d3";
-import { useDataContext } from "./RawDataContext";
+import { extent, quantile, scaleLinear, scalePoint, utcFormat } from "d3";
 
 const onSceneReady = (
   scene: Scene,
@@ -155,7 +155,8 @@ const onSceneReady = (
 };
 
 export const Viz3D = () => {
-  const { dimensions, values } = useDataContext();
+  const dimensions = useDataStore((state) => state.dimensions);
+  const values = useDataStore((state) => state.values);
 
   return (
     <SceneComponent

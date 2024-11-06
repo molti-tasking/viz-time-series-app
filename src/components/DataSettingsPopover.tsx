@@ -13,12 +13,12 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { useDataStore } from "@/store/dataStore";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ChevronDownIcon } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { useDataContext } from "./RawDataContext";
 import { Input } from "./ui/input";
 import { Tabs, TabsList, TabsTrigger } from "./ui/tabs";
 
@@ -48,15 +48,12 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 const SettingsForm = ({ onClose }: { onClose: () => void }) => {
-  const {
-    dimensions,
-    mode,
-    values,
-    streamingInterval,
-    setMode,
-    generateData,
-    setStreamingInterval,
-  } = useDataContext();
+  const dimensions = useDataStore((state) => state.dimensions);
+  const values = useDataStore((state) => state.values);
+  const streamingInterval = useDataStore((state) => state.streamingInterval);
+  const mode = useDataStore((state) => state.mode);
+
+  const updateData = useDataStore((state) => state.updateData);
 
   const defaultValues = {
     mode: mode,
@@ -64,7 +61,7 @@ const SettingsForm = ({ onClose }: { onClose: () => void }) => {
     columns: dimensions.length,
     streamingInterval: streamingInterval ?? 0,
   };
-  console.log(defaultValues);
+
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues,
@@ -73,17 +70,12 @@ const SettingsForm = ({ onClose }: { onClose: () => void }) => {
   const onSubmit = (data: FormValues) => {
     const { rows, columns, streamingInterval } = data;
 
-    // Known issue that the data generation uses wrong mode on first submission!!!
-    // Is not fixed as we want to migrate to Zustand; for the moment you have to trigger submission twice.
-    setMode(data.mode);
-
-    // We add one column because it's getting sneaked away otherwise. Check implementation in useDataContext to see.
-    generateData(rows, columns + 1);
-    if (streamingInterval > 0) {
-      setStreamingInterval(streamingInterval);
-    } else {
-      setStreamingInterval(null);
-    }
+    updateData(
+      data.mode,
+      columns,
+      rows,
+      streamingInterval > 0 ? streamingInterval : undefined
+    );
 
     onClose();
   };
