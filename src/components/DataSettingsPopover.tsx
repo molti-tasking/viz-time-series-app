@@ -20,6 +20,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useDataContext } from "./RawDataContext";
 import { Input } from "./ui/input";
+import { Tabs, TabsList, TabsTrigger } from "./ui/tabs";
 
 export function DataSettingsPopover() {
   const [open, setOpen] = useState(false);
@@ -38,6 +39,7 @@ export function DataSettingsPopover() {
 }
 
 const formSchema = z.object({
+  mode: z.enum(["random", "peaks"]),
   rows: z.coerce.number(),
   columns: z.coerce.number(),
   streamingInterval: z.coerce.number(),
@@ -48,13 +50,16 @@ type FormValues = z.infer<typeof formSchema>;
 const SettingsForm = ({ onClose }: { onClose: () => void }) => {
   const {
     dimensions,
+    mode,
     values,
     streamingInterval,
+    setMode,
     generateData,
     setStreamingInterval,
   } = useDataContext();
 
   const defaultValues = {
+    mode: mode,
     rows: values.length,
     columns: dimensions.length,
     streamingInterval: streamingInterval ?? 0,
@@ -65,8 +70,13 @@ const SettingsForm = ({ onClose }: { onClose: () => void }) => {
     defaultValues,
   });
 
-  const onSubmit = async (data: FormValues) => {
+  const onSubmit = (data: FormValues) => {
     const { rows, columns, streamingInterval } = data;
+
+    // Known issue that the data generation uses wrong mode on first submission!!!
+    // Is not fixed as we want to migrate to Zustand; for the moment you have to trigger submission twice.
+    setMode(data.mode);
+
     // We add one column because it's getting sneaked away otherwise. Check implementation in useDataContext to see.
     generateData(rows, columns + 1);
     if (streamingInterval > 0) {
@@ -88,6 +98,35 @@ const SettingsForm = ({ onClose }: { onClose: () => void }) => {
               Set the scale for the data.
             </p>
           </div>
+
+          <FormField
+            control={form.control}
+            name="mode"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Data Generation Mode</FormLabel>
+                <FormControl>
+                  <Tabs
+                    value={field.value}
+                    onValueChange={(mode) => field.onChange(mode)}
+                  >
+                    <TabsList>
+                      {formSchema.shape.mode.options.map((mode) => (
+                        <TabsTrigger value={mode} key={mode}>
+                          {mode}
+                        </TabsTrigger>
+                      ))}
+                    </TabsList>
+                  </Tabs>
+                </FormControl>
+                <FormDescription>
+                  Depending on the selected mode the generated data will follow
+                  a certain pattern.
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
           <FormField
             control={form.control}
