@@ -114,12 +114,11 @@ const chartModeSpecs: Record<
 export const HorizontalWrappedLineChart = () => {
   const { values, dimensions } = useDataContext();
 
-  const [presentationSettings, setPresentationSettings] =
-    useState<ChartWrappingSettings>({
-      meanRange: 0.1,
-      tickRange: 8,
-      mode: "multiline",
-    });
+  const [presentationSettings] = useState<ChartWrappingSettings>({
+    meanRange: 0.1,
+    tickRange: 8,
+    mode: "multiline",
+  });
 
   const { filteredData } = wrapper(values, dimensions, presentationSettings);
 
@@ -145,7 +144,7 @@ const AggregatedLineChart = ({
   yDomain,
   mode,
 }: {
-  values: Record<string, number>[];
+  values: Record<string, number | undefined>[];
   className?: ClassValue;
   yDomain?: [number, number];
   mode: ChartPresentationSettings["mode"];
