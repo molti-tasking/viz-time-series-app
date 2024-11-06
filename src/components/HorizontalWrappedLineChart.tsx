@@ -131,10 +131,7 @@ export const HorizontalWrappedLineChart = () => {
         /> */}
         <div>Make stuff configurable</div>
       </div>
-      <AggregatedLineChart
-        values={filteredData}
-        mode={presentationSettings.mode}
-      />
+      <AggregatedLineChart values={filteredData} mode="multiline" />
     </div>
   );
 };

@@ -10,6 +10,7 @@ const inputValues = [
   20394, 9,
 ];
 
+// @ts-expect-error We only use this deno benchmarking locally to measure performance of different implementations
 Deno.bench({
   name: "benchmark relative range a",
   fn() {
@@ -17,6 +18,7 @@ Deno.bench({
   },
 });
 
+// @ts-expect-error We only use this deno benchmarking locally to measure performance of different implementations
 Deno.bench({
   name: "benchmark relative range b",
   fn() {

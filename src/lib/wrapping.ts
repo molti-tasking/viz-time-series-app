@@ -9,7 +9,7 @@ export type ChartWrappingSettings = {
    * @default 3
    */
   tickRange: number;
-  mode: "multiline" | "envelope";
+  mode?: "multiline" | "envelope";
 };
 
 export const wrapper = (
