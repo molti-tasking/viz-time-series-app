@@ -4,7 +4,8 @@ interface DataStore {
   mode: "random" | "peaks";
   dimensions: string[];
   values: Record<string, number>[];
-  streamingInterval: null | number;
+  streamingInterval: number | null;
+  intervalId: NodeJS.Timeout | null;
 
   updateData: (
     mode: "random" | "peaks",
@@ -14,15 +15,25 @@ interface DataStore {
   ) => void;
 }
 
-export const useDataStore = create<DataStore>((set) => ({
+export const useDataStore = create<DataStore>((set, get) => ({
   mode: "random",
   dimensions: [],
   values: [],
   streamingInterval: null,
+  intervalId: null,
 
   updateData: (mode, columnCount, rowCount, streamingInterval) => {
-    set({ mode, streamingInterval });
+    const { intervalId } = get();
+    if (intervalId) clearInterval(intervalId);
+    set({ mode, streamingInterval, values: [], dimensions: [] });
     generateData(columnCount, rowCount);
+    if (streamingInterval) {
+      const newIntervalId = setInterval(() => {
+        console.log("Stream update");
+        streamDataUpdate();
+      }, streamingInterval);
+      set({ intervalId: newIntervalId });
+    }
   },
 }));
 
@@ -38,9 +49,9 @@ const generateData = (columns: number, rows: number, min = 5, max = 10) => {
   ];
   let newData: number[][] = [];
   if (mode === "random") {
-    newData = generateRandomTestData(rows, columns, min, max);
+    newData = generateRandomTestData(columns, rows, min, max);
   } else if (mode === "peaks") {
-    newData = generatePeakTestData(rows, columns, min, max);
+    newData = generatePeakTestData(columns, rows, min, max);
   }
 
   const values = newData.map((row) =>
@@ -55,6 +66,41 @@ const generateData = (columns: number, rows: number, min = 5, max = 10) => {
   });
 };
 
+const streamDataUpdate = () => {
+  const { values, mode } = useDataStore.getState();
+  const lastRow = values[values.length - 1];
+
+  if (!lastRow) return;
+
+  const newRow: Record<string, number> = {
+    timestamp: lastRow.timestamp + 1000 + (Math.random() - 0.5) * 200,
+  };
+
+  if (mode === "random") {
+    Object.keys(lastRow).forEach((key) => {
+      if (key !== "timestamp") {
+        const prevValue = lastRow[key];
+
+        newRow[key] = getRandomNextValue(prevValue);
+      }
+    });
+  } else if (mode === "peaks") {
+    const lastRowWithoutTimestamp = Object.entries(lastRow).filter(
+      ([key]) => key !== "timestamp"
+    );
+    const prevValues = lastRowWithoutTimestamp.map(([, v]) => v);
+    const newValues = generateNextPeakTestData(prevValues);
+    lastRowWithoutTimestamp.forEach(([key], indx) => {
+      newRow[key] = newValues[indx];
+    });
+  }
+
+  // Add new row to values
+  useDataStore.setState((state) => ({
+    values: [...state.values, newRow],
+  }));
+};
+
 // Helper functions
 const getRandomNextValue = (prev: number) => {
   return Math.random() > 0.5
@@ -64,8 +110,8 @@ const getRandomNextValue = (prev: number) => {
 };
 
 const generateRandomTestData = (
-  rowsCount: number,
   columnsCount: number,
+  rowsCount: number,
   min: number,
   max: number
 ) => {
@@ -84,17 +130,64 @@ const generateRandomTestData = (
   }, [] as number[][]);
 };
 
+let peakActive = false;
+let peakDecayCounter = 0;
+let peakDuration = 0;
+let baselineValues: number[] = [];
+
+const generateNextPeakTestData = (
+  /**
+   * Array of previous value, it should not include a timestamp
+   */
+  previousValues: number[]
+) => {
+  let randomValues: number[];
+
+  if (peakActive) {
+    if (peakDecayCounter > 0) {
+      randomValues = previousValues.map(
+        (value, index) =>
+          value - (value - baselineValues[index]) * (0.2 + Math.random() * 0.1)
+      );
+
+      peakDecayCounter--;
+      if (peakDecayCounter === 0) peakActive = false;
+    } else {
+      randomValues = previousValues.map(
+        (value) => value * (1 + Math.random() * 0.2)
+      );
+
+      peakDecayCounter = peakDuration;
+    }
+  } else {
+    randomValues = previousValues.map((value, index) => {
+      baselineValues[index] += (Math.random() - 0.5) * 0.02;
+      return value * (1 + (Math.random() - 0.5) * 0.03);
+    });
+
+    if (Math.random() < 0.05) {
+      peakActive = true;
+      peakDuration = Math.floor(5 + Math.random() * 5);
+      randomValues = previousValues.map(
+        (value) => value * (1 + Math.random() * Math.random() * 0.5)
+      );
+    }
+  }
+
+  return randomValues;
+};
+
 const generatePeakTestData = (
-  rowsCount: number,
   columnsCount: number,
+  rowsCount: number,
   min: number,
   max: number
 ) => {
   const startTime = Date.now();
-  let peakActive = false;
-  let peakDecayCounter = 0;
-  let peakDuration = 0;
-  let baselineValues: number[] = [];
+  peakActive = false;
+  peakDecayCounter = 0;
+  peakDuration = 0;
+  baselineValues = [];
   return Array.from<number[][]>({ length: rowsCount }).reduce((prev, _, i) => {
     const timestamp = startTime + i * 1000 + (Math.random() - 0.5) * 200;
     let randomValues: number[];
@@ -105,37 +198,8 @@ const generatePeakTestData = (
       );
       baselineValues = randomValues.slice();
     } else {
-      const previousValues = prev[i - 1].slice(1);
-      if (peakActive) {
-        if (peakDecayCounter > 0) {
-          randomValues = previousValues.map(
-            (value, index) =>
-              value -
-              (value - baselineValues[index]) * (0.2 + Math.random() * 0.1)
-          );
-          peakDecayCounter--;
-          if (peakDecayCounter === 0) peakActive = false;
-        } else {
-          randomValues = previousValues.map(
-            (value) => value * (1 + Math.random() * 0.2)
-          );
-          peakDecayCounter = peakDuration;
-        }
-      } else {
-        randomValues = previousValues.map((value, index) => {
-          baselineValues[index] += (Math.random() - 0.5) * 0.02;
-          return value * (1 + (Math.random() - 0.5) * 0.03);
-        });
-        if (Math.random() < 0.05) {
-          peakActive = true;
-          peakDuration = Math.floor(5 + Math.random() * 5);
-          randomValues = previousValues.map(
-            (value) => value * (1 + Math.random() * Math.random() * 0.5)
-          );
-        }
-      }
+      randomValues = generateNextPeakTestData(prev[i - 1].slice(1));
     }
-    const row = [timestamp, ...randomValues];
-    return [...prev, row];
+    return [...prev, [timestamp, ...randomValues]];
   }, [] as number[][]);
 };

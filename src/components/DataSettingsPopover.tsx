@@ -174,7 +174,7 @@ const SettingsForm = ({ onClose }: { onClose: () => void }) => {
             )}
           />
 
-          <Button type="submit">Submit</Button>
+          <Button type="submit">Reset & Submit</Button>
         </div>
       </form>
     </Form>

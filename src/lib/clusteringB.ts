@@ -107,6 +107,7 @@ export const aggregatorB = (
       key === "timestamp" ? [] : [value]
     )
   );
+
   const yMin = Math.min(...allValues);
   const yMax = Math.max(...allValues);
   const yDomain: [number, number] = [yMin, yMax];

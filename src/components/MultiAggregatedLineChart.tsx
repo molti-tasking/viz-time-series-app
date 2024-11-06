@@ -140,8 +140,8 @@ export const MultiAggregatedLineChart = () => {
   const [presentationSettings, setPresentationSettings] =
     useState<ClusterChartPreferences>({
       clusterCount: 2,
-      dataTicks: 30,
-      mode: "envelope",
+      dataTicks: Math.min(values.length, 100),
+      mode: "multiline",
     });
 
   const { aggregated, colsAccordingToAggregation, yDomain } = aggregatorB(
