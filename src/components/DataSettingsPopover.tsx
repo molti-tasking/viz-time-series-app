@@ -37,13 +37,13 @@ export function DataSettingsPopover() {
   );
 }
 
-const scaleSchema = z.object({
+const formSchema = z.object({
   rows: z.coerce.number(),
   columns: z.coerce.number(),
   streamingInterval: z.coerce.number(),
 });
 
-type ScaleFormSchema = z.infer<typeof scaleSchema>;
+type FormValues = z.infer<typeof formSchema>;
 
 const SettingsForm = ({ onClose }: { onClose: () => void }) => {
   const {
@@ -60,12 +60,12 @@ const SettingsForm = ({ onClose }: { onClose: () => void }) => {
     streamingInterval: streamingInterval ?? 0,
   };
   console.log(defaultValues);
-  const form = useForm<ScaleFormSchema>({
-    resolver: zodResolver(scaleSchema),
+  const form = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
     defaultValues,
   });
 
-  const onSubmit = async (data: ScaleFormSchema) => {
+  const onSubmit = async (data: FormValues) => {
     const { rows, columns, streamingInterval } = data;
     // We add one column because it's getting sneaked away otherwise. Check implementation in useDataContext to see.
     generateData(rows, columns + 1);

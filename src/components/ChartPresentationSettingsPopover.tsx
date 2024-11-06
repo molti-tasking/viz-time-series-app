@@ -1,17 +1,17 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { ChevronDownIcon } from "lucide-react";
-import { Input } from "./ui/input";
-import React, { useState } from "react";
-import { Label } from "./ui/label";
-import { cn } from "@/lib/utils";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChartPresentationSettings } from "@/lib/clustering";
+import { cn } from "@/lib/utils";
+import { ChevronDownIcon } from "lucide-react";
+import React, { useState } from "react";
+import { Input } from "./ui/input";
+import { Label } from "./ui/label";
 
 interface ChartPresentationSettingsPopoverProps {
   settings: ChartPresentationSettings;
@@ -29,7 +29,7 @@ export function ChartPresentationSettingsPopover(
           <ChevronDownIcon /> Configure Presentation
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-96">
+      <PopoverContent className="w-96 z-[2000]">
         <ChartPresentationSettingsForm
           onClose={() => setOpen(false)}
           {...props}

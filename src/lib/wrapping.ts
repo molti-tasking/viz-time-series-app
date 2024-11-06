@@ -1,11 +1,11 @@
 export type ChartWrappingSettings = {
   /**
-   * This value is a threshold. Whenever one of the values of a given range is outside of the a relative range apart from the mean, it will be considered as significant.
+   * This value is a threshold. Whenever one of the values of a given range is outside of the a relative range apart from the mean, it will be considered as significant. Should be a number between 0 and 1.
    *
    */
   meanRange: number;
   /**
-   * Ticks to be taken into account for the check if there is a relevant threshold.
+   * Ticks to be taken into account for the check if there is a relevant threshold. Should be at least 3.
    * @default 3
    */
   tickRange: number;
@@ -56,7 +56,9 @@ export const wrapper = (
       const currentEntry = rawData[entryIndex];
       if (shouldSetValueToUndefined) {
         // This has to be defined like this in order to create a new object, rather than just copying the reference.
-        const undefinedObject = { ...currentEntry };
+        const undefinedObject: Record<string, number | undefined> = {
+          ...currentEntry,
+        };
         for (
           let dimensionIndex = 0;
           dimensionIndex < dimensions.length;

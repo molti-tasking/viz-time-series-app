@@ -1,4 +1,5 @@
-import { type ChartPresentationSettings, aggregator } from "@/lib/clustering";
+import { type ChartPresentationSettings } from "@/lib/clustering";
+import { aggregatorB } from "@/lib/clusteringB";
 import { cn, deepMerge } from "@/lib/utils";
 import { type ClassValue } from "clsx";
 import { useState } from "react";
@@ -141,7 +142,7 @@ export const MultiAggregatedLineChart = () => {
       mode: "envelope",
     });
 
-  const { aggregated, colsAccordingToAggregation, yDomain } = aggregator(
+  const { aggregated, colsAccordingToAggregation, yDomain } = aggregatorB(
     values,
     dimensions,
     presentationSettings
