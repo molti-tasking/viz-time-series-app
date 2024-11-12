@@ -113,7 +113,6 @@ const chartModeSpecs: Record<
       },
     ],
   },
-  horizon: {},
 };
 
 // TODO: Make this chart mostly recursive in a way that a user sees a subset whenever he selects one of those charts
@@ -142,6 +141,7 @@ export const MultiAggregatedLineChart = () => {
       clusterCount: 2,
       dataTicks: Math.min(values.length, 100),
       mode: "multiline",
+      ignoreBoringDataMode: "off",
     });
 
   const { aggregated, colsAccordingToAggregation, yDomain } = aggregatorB(

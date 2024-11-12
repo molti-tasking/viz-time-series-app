@@ -79,6 +79,10 @@ export const wrapper = (
   return { filteredData };
 };
 
+export const findUnusedTimestamps = () => {
+  // Pretty much do same thing, but whenever we find a value that is "boring", we put its timestamp and index into an array and return it.
+};
+
 export const calculateRelativeRangeA = (...numbers: number[]) => {
   // Calculate the mean
   const mean = numbers.reduce((sum, num) => sum + num, 0) / numbers.length;

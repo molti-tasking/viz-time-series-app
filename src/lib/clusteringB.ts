@@ -9,7 +9,7 @@ export type ChartPresentationSettings = (
       eps: number;
     }
 ) & {
-  mode: "multiline" | "envelope" | "horizon";
+  mode: "multiline" | "envelope";
 
   dataTicks?: number;
   timeScale?: { from: number; to: number };

@@ -23,13 +23,13 @@ export function ClusterChartPreferencesPopover(
 ) {
   const [open, setOpen] = useState(false);
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={setOpen} modal>
       <PopoverTrigger asChild>
         <Button>
           <ChevronDownIcon /> Configure Presentation
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-96 z-[2000]">
+      <PopoverContent className="max-w-screen-sm w-full z-[2000]">
         <SettingsForm onClose={() => setOpen(false)} {...props} />
       </PopoverContent>
     </Popover>
@@ -39,7 +39,14 @@ export function ClusterChartPreferencesPopover(
 const chartViewOptions: Record<ClusterChartPreferences["mode"], string> = {
   multiline: "Multiline",
   envelope: "Envelope",
-  horizon: "Horizon (tbd.)",
+};
+
+const ignoreBoringDataModeOptions: Record<
+  ClusterChartPreferences["ignoreBoringDataMode"],
+  string
+> = {
+  off: "Off",
+  standard: "Standard",
 };
 
 const SettingsForm = ({
@@ -50,7 +57,7 @@ const SettingsForm = ({
   onClose: () => void;
 } & ClusterChartPreferencesPopoverProps) => {
   return (
-    <div className="grid gap-8">
+    <div className="grid gap-4">
       <div className="space-y-2">
         <h4 className="text-lg font-medium leading-none">
           Data Presentation Settings
@@ -58,31 +65,6 @@ const SettingsForm = ({
         <p className="text-sm text-muted-foreground">
           Set the desired filters for your data.
         </p>
-      </div>
-
-      <div className="grid w-full max-w-sm items-center gap-1.5">
-        <Label htmlFor="chartViewMode">Chart View Mode</Label>
-        <Tabs
-          id="chartViewMode"
-          value={settings.mode}
-          onValueChange={(mode) =>
-            setSettings((curr) => ({
-              ...curr,
-              mode: mode as ClusterChartPreferences["mode"],
-            }))
-          }
-        >
-          <TabsList>
-            {Object.entries(chartViewOptions).map(([key, label]) => (
-              <TabsTrigger value={key} key={key}>
-                {label}
-              </TabsTrigger>
-            ))}
-          </TabsList>
-          <TabsContent value="horizon">
-            This view is not implemented yet.
-          </TabsContent>
-        </Tabs>
       </div>
 
       <div className="grid w-full grid-cols-2 gap-2 items-start">
@@ -135,6 +117,28 @@ const SettingsForm = ({
       </div>
 
       <div className="grid w-full max-w-sm items-center gap-1.5">
+        <Label htmlFor="chartViewMode">Chart View Mode</Label>
+        <Tabs
+          id="chartViewMode"
+          value={settings.mode}
+          onValueChange={(mode) =>
+            setSettings((curr) => ({
+              ...curr,
+              mode: mode as ClusterChartPreferences["mode"],
+            }))
+          }
+        >
+          <TabsList>
+            {Object.entries(chartViewOptions).map(([key, label]) => (
+              <TabsTrigger value={key} key={key}>
+                {label}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </Tabs>
+      </div>
+
+      <div className="grid w-full max-w-sm items-center gap-1.5">
         <Label htmlFor="dataTicks">Data Ticks</Label>
         <Input
           type="number"
@@ -153,6 +157,57 @@ const SettingsForm = ({
           not.
         </p>
       </div>
+
+      <Label htmlFor="ignoreBoringDataMode">Ignore boring data mode</Label>
+      <Tabs
+        id="ignoreBoringDataMode"
+        value={settings.ignoreBoringDataMode}
+        onValueChange={(mode) =>
+          setSettings((curr) => ({
+            ...curr,
+            ignoreBoringDataMode:
+              mode as ClusterChartPreferences["ignoreBoringDataMode"],
+          }))
+        }
+      >
+        <TabsList>
+          {Object.entries(ignoreBoringDataModeOptions).map(([key, label]) => (
+            <TabsTrigger value={key} key={key}>
+              {label}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+        <TabsContent
+          value="standard"
+          className="grid w-full grid-cols-2 gap-2 items-start"
+        >
+          <div className="grid w-full max-w-sm items-center gap-1.5">
+            <Label htmlFor="meanRange">Relative mean range</Label>
+            <Input
+              type="number"
+              id="meanRange"
+              placeholder="Mean range"
+              step={0.05}
+              min={0.0}
+              max={0.9999}
+            />
+            <p className={cn("text-sm text-muted-foreground")}>
+              Define the relative sensitivity in a way of how much data has to
+              be away from the mean of the respective data ticks in order to be
+              significant enough to be displayed.
+            </p>
+          </div>
+
+          <div className="grid w-full max-w-sm items-center gap-1.5">
+            <Label htmlFor="tickRange">Tick range</Label>
+            <Input type="number" id="tickRange" placeholder="Tick range" />
+            <p className={cn("text-sm text-muted-foreground")}>
+              Define the amount of data points that are considered to define a
+              mean value.
+            </p>
+          </div>
+        </TabsContent>
+      </Tabs>
 
       {/* <div className="grid w-full max-w-sm items-center gap-1.5">
         <div>

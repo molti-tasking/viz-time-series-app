@@ -8,12 +8,29 @@ export type ClusterChartPreferences = (
        */
       eps: number;
     }
-) & {
-  mode: "multiline" | "envelope" | "horizon";
+) &
+  (
+    | object
+    | {
+        /**
+         * This value is a threshold. Whenever one of the values of a given range is outside of the a relative range apart from the mean, it will be considered as significant. Should be a number between 0 and 1.
+         *
+         */
+        meanRange: number;
+        /**
+         * Ticks to be taken into account for the check if there is a relevant threshold. Should be at least 3.
+         * @default 3
+         */
+        tickRange: number;
+      }
+  ) & {
+    mode: "multiline" | "envelope";
 
-  dataTicks?: number;
-  timeScale?: { from: number; to: number };
-};
+    dataTicks?: number;
+    timeScale?: { from: number; to: number };
+
+    ignoreBoringDataMode: "off" | "standard";
+  };
 
 type AggregatedProps = {
   aggregated: Record<string, number>[][];
@@ -83,6 +100,22 @@ export const aggregator = (
     });
   } else if ("clusterCount" in settings && !!settings.clusterCount) {
     aggregated = clustering(dataToBeClustered, settings.clusterCount);
+  }
+
+  if (
+    settings.ignoreBoringDataMode === "standard" &&
+    "meanRange" in settings &&
+    !!settings.meanRange &&
+    "tickRange" in settings &&
+    !!settings.tickRange
+  ) {
+    // TODO Here start the cluster wrapping
+    // ----------------
+    // Starting the wrapping of unneeded data now after we clustered it.
+    // ----------------
+    // 1. Get unimportant data areas for each cluster
+    // 2. Get the unimportant data areas that all clusters have in common
+    // 3. Set those data points to undefined
   }
 
   const colsAccordingToAggregation: [string, number][] = dimensions.map(
@@ -246,4 +279,48 @@ const clusteringDBSCAN = (
   }
 
   return clusters;
+};
+
+/**
+ * We have to bring these column-grouped clusters now again in the structure that they are grouped by timestamp. This way they are required in order to be displayed properly
+ *
+ * @param clusters grouped by column clusters
+ * @returns
+ */
+export const regroupClustersA = (
+  clusters: [string, Record<number, number>][][]
+): Record<string, number>[][] => {
+  return clusters.map((cluster) => {
+    const timestamps = Object.keys(cluster[0][1]);
+    return timestamps.map((timestamp) => {
+      return cluster.reduce(
+        (prev, [colName, values]) => ({
+          ...prev,
+          [colName]: values[Number(timestamp)],
+        }),
+        {
+          timestamp: Number(timestamp),
+        }
+      );
+    });
+  });
+};
+
+export const regroupClustersB = (
+  clusters: [string, Record<number, number>][][]
+): Record<string, number>[][] => {
+  return clusters.map((cluster) => {
+    const timestamps = Object.keys(cluster[0][1]);
+    return timestamps.map((timestamp) => {
+      return cluster.reduce(
+        (prev, [colName, values]) => ({
+          ...prev,
+          [colName]: values[Number(timestamp)],
+        }),
+        {
+          timestamp: Number(timestamp),
+        }
+      );
+    });
+  });
 };
