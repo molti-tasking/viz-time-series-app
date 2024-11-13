@@ -1,3 +1,6 @@
+import { findCommonElements } from "./findCommonElements";
+import { findBoringTimestamps } from "./wrapping";
+
 export type ChartPresentationSettings = (
   | {
       clusterCount: number;
@@ -8,12 +11,31 @@ export type ChartPresentationSettings = (
        */
       eps: number;
     }
-) & {
-  mode: "multiline" | "envelope";
+) &
+  (
+    | object
+    | {
+        /**
+         * This value is a threshold. Whenever one of the values of a given range is outside of the a relative range apart from the mean, it will be considered as significant. Should be a number between 0 and 1.
+         *
+         */
+        meanRange: number;
+        /**
+         * Ticks to be taken into account for the check if there is a relevant threshold. Should be at least 3.
+         * @default 3
+         */
+        tickRange: number;
 
-  dataTicks?: number;
-  timeScale?: { from: number; to: number };
-};
+        // TODO implement a "saveScreenSpace" option
+      }
+  ) & {
+    mode: "multiline" | "envelope";
+
+    dataTicks?: number;
+    timeScale?: { from: number; to: number };
+
+    ignoreBoringDataMode: "off" | "standard";
+  };
 
 type AggregatedProps = {
   aggregated: Record<string, number>[][];
@@ -34,10 +56,17 @@ export const aggregatorB = (
   dimensions: string[],
   settings: ChartPresentationSettings
 ): AggregatedProps => {
+  // ----------------
+  // Filtering data to time
+  // ----------------
   let dataToBeClustered = rawData;
   if (settings.dataTicks) {
     dataToBeClustered = rawData.slice(-1 * settings.dataTicks);
   }
+
+  // ----------------
+  // Clustering data
+  // ----------------
 
   let aggregated: Record<string, number>[][] = [dataToBeClustered];
   if ("eps" in settings && !!settings.eps) {
@@ -93,6 +122,129 @@ export const aggregatorB = (
   } else if ("clusterCount" in settings && !!settings.clusterCount) {
     aggregated = clustering(dataToBeClustered, settings.clusterCount);
   }
+
+  // ----------------
+  // Wrapping of boring data now after we clustered it.
+  // ----------------
+  if (
+    settings.ignoreBoringDataMode === "standard" &&
+    "meanRange" in settings &&
+    !!settings.meanRange &&
+    "tickRange" in settings &&
+    !!settings.tickRange
+  ) {
+    // Map all cluster dimensions because we need them later in order to set the values to undefined if needed.
+    const clustersDimensions: string[][] = [];
+    for (
+      let clusterIndex = 0;
+      clusterIndex < aggregated.length;
+      clusterIndex++
+    ) {
+      const cluster = aggregated[clusterIndex];
+      const dims = Object.keys(cluster[0] || {}).filter(
+        (key) => key !== "timestamp"
+      );
+      clustersDimensions.push(dims);
+    }
+
+    // 1. Get unimportant data areas for each cluster
+    const allBoringValues = aggregated.map((aggregatedValues, index) =>
+      findBoringTimestamps(
+        aggregatedValues,
+        clustersDimensions[index],
+        settings
+      )
+    );
+    // 2. Get the unimportant data areas that all clusters have in common
+    const commonBoringData = findCommonElements(allBoringValues).sort();
+
+    // 3. Set those data points to undefined
+
+    if (commonBoringData.length) {
+      // Filter all timestamps upfront for better readability
+      const allTimestamps = [];
+      for (
+        let entryIndex = 0;
+        entryIndex < aggregated[0].length;
+        entryIndex++
+      ) {
+        const element = aggregated[0][entryIndex];
+        allTimestamps.push(element["timestamp"]);
+      }
+
+      const newAggregated: Record<string, number>[][] = [];
+      for (
+        let clusterIndex = 0;
+        clusterIndex < aggregated.length;
+        clusterIndex++
+      ) {
+        newAggregated.push([]); // using this loop to also initialize the new aggregated empty array
+      }
+
+      let wasPrevBoring = false;
+      // IMPORTANT: We have to know that all aggregated clusters have the same timestamps and also all of them have to be in the same order!
+      for (
+        let entryIndex = 0;
+        entryIndex < allTimestamps.length;
+        entryIndex++
+      ) {
+        const timestamp = allTimestamps[entryIndex];
+        const isUnimportantData = commonBoringData.includes(timestamp);
+
+        if (isUnimportantData) {
+          // TODO: Make this optional based on the "saveScreenSpace" variable
+          // If previous value was also boring, we don't insert even a new value. If prev was not boring, this is just first one being boring so it should be having only nullable values in order to show some "empty space" to the user later on.
+          if (wasPrevBoring) {
+          } else {
+            // Set value undefined for each cluster values
+            for (
+              let clusterIndex = 0;
+              clusterIndex < aggregated.length;
+              clusterIndex++
+            ) {
+              // This has to be defined like this in order to create a new object, rather than just copying the reference.
+              const undefinedObject: Record<string, number | undefined> = {
+                ...aggregated[clusterIndex][entryIndex],
+              };
+              const clusterDimensions = clustersDimensions[clusterIndex];
+              for (
+                let dimensionIndex = 0;
+                dimensionIndex < clusterDimensions.length;
+                dimensionIndex++
+              ) {
+                const dimension = clusterDimensions[dimensionIndex];
+                undefinedObject[dimension] = undefined;
+              }
+
+              newAggregated[clusterIndex].push(
+                undefinedObject as Record<string, number>
+              );
+            }
+
+            wasPrevBoring = true;
+          }
+        } else {
+          for (
+            let clusterIndex = 0;
+            clusterIndex < aggregated.length;
+            clusterIndex++
+          ) {
+            // Value is not boring, it is significant so we add to new aggregated values
+            newAggregated[clusterIndex].push(
+              aggregated[clusterIndex][entryIndex]
+            );
+          }
+          wasPrevBoring = false;
+        }
+      }
+
+      aggregated = newAggregated;
+    }
+  }
+
+  // ----------------
+  // Getting meta data, like all cols and y-domain
+  // ----------------
 
   const colsAccordingToAggregation: [string, number][] = dimensions.map(
     (val) => [

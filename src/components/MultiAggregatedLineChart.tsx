@@ -139,7 +139,7 @@ export const MultiAggregatedLineChart = () => {
   const [presentationSettings, setPresentationSettings] =
     useState<ClusterChartPreferences>({
       clusterCount: 2,
-      dataTicks: Math.min(values.length, 100),
+      dataTicks: values.length,
       mode: "multiline",
       ignoreBoringDataMode: "off",
     });
@@ -150,21 +150,17 @@ export const MultiAggregatedLineChart = () => {
     presentationSettings
   );
 
+  const boringDataCount = values.length - aggregated[0].length;
+
   return (
     <div className="container w-full my-2 flex flex-col flex-wrap gap-2">
-      <div className="flex flex-row-reverse gap-4 items-center">
+      <div className="flex flex-row justify-between gap-4 items-center">
+        <div>Ignored {boringDataCount} entries</div>
         <ClusterChartPreferencesPopover
           settings={presentationSettings}
           setSettings={setPresentationSettings}
         />
-        {/* <span>Amount of clusters (sorted by last value)</span>
-        <div>
-          <Input
-            value={clusterCount}
-            onChange={(event) => setClusterCount(event.target.valueAsNumber)}
-            type="number"
-          />
-        </div> */}
+        {/* <pre>{JSON.stringify(presentationSettings)}</pre> */}
       </div>
       {/* <div className="w-full my-2 flex flex-row flex-wrap gap-2"> */}
       {aggregated.map((val, index) => (
@@ -242,12 +238,7 @@ const AggregatedLineChart = ({
     <VegaLite
       spec={spec}
       style={{ cursor: "pointer" }}
-      className={cn(
-        "flex-1",
-        className,
-        "rounded-sm overflow-hidden",
-        "hover:shadow-lg transition"
-      )}
+      className={cn("flex-1", className, "rounded-sm overflow-hidden")}
     />
   );
 };

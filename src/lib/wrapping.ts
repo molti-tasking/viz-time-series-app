@@ -79,8 +79,56 @@ export const wrapper = (
   return { filteredData };
 };
 
-export const findUnusedTimestamps = () => {
+export const findBoringTimestamps = (
+  rawData: Record<string, number>[],
+  dimensions: string[],
+  settings: DataCompressionPreferences
+): number[] => {
   // Pretty much do same thing, but whenever we find a value that is "boring", we put its timestamp and index into an array and return it.
+
+  const totalTickRange = Math.floor(settings.tickRange) ?? 3;
+  const ticksBefore = Math.floor((totalTickRange - 1) / 2);
+  const ticksAfter = totalTickRange - ticksBefore;
+
+  const boringEntries: number[] = [];
+  for (let entryIndex = 0; entryIndex < rawData.length; entryIndex++) {
+    if (
+      entryIndex <= ticksBefore - 1 ||
+      entryIndex > rawData.length - ticksAfter
+    ) {
+    } else {
+      const currentSection = rawData.slice(
+        entryIndex - ticksBefore,
+        entryIndex + ticksAfter
+      );
+
+      let isBoringValue = true;
+      for (
+        let dimensionIndex = 0;
+        dimensionIndex < dimensions.length;
+        dimensionIndex++
+      ) {
+        const dimension = dimensions[dimensionIndex];
+
+        const relativeRange = calculateRelativeRangeB(
+          ...currentSection.map((e) => e[dimension])
+        );
+        if (settings.meanRange > relativeRange) {
+        } else {
+          isBoringValue = false;
+          break;
+        }
+      }
+
+      const currentEntry = rawData[entryIndex];
+      if (isBoringValue) {
+        // This has to be defined like this in order to create a new object, rather than just copying the reference.
+        boringEntries.push(currentEntry["timestamp"]);
+      }
+    }
+  }
+
+  return boringEntries;
 };
 
 export const calculateRelativeRangeA = (...numbers: number[]) => {

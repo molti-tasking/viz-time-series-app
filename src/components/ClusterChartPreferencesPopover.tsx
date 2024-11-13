@@ -190,6 +190,13 @@ const SettingsForm = ({
               step={0.05}
               min={0.0}
               max={0.9999}
+              value={"meanRange" in settings ? settings.meanRange : undefined}
+              onChange={(e) =>
+                setSettings((curr) => ({
+                  ...curr,
+                  meanRange: e.target.valueAsNumber,
+                }))
+              }
             />
             <p className={cn("text-sm text-muted-foreground")}>
               Define the relative sensitivity in a way of how much data has to
@@ -200,7 +207,18 @@ const SettingsForm = ({
 
           <div className="grid w-full max-w-sm items-center gap-1.5">
             <Label htmlFor="tickRange">Tick range</Label>
-            <Input type="number" id="tickRange" placeholder="Tick range" />
+            <Input
+              type="number"
+              id="tickRange"
+              placeholder="Tick range"
+              value={"tickRange" in settings ? settings.tickRange : undefined}
+              onChange={(e) =>
+                setSettings((curr) => ({
+                  ...curr,
+                  tickRange: e.target.valueAsNumber,
+                }))
+              }
+            />
             <p className={cn("text-sm text-muted-foreground")}>
               Define the amount of data points that are considered to define a
               mean value.
