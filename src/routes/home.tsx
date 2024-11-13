@@ -5,7 +5,7 @@ export default function Home() {
   const values = useDataStore((state) => state.values);
   const updateData = useDataStore((state) => state.updateData);
   const generateInitialData = () => {
-    updateData("random", 8, 20);
+    updateData("peaks", 12, 40);
   };
   return (
     <div className="container">

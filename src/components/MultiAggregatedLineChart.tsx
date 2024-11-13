@@ -137,10 +137,12 @@ export const MultiAggregatedLineChart = () => {
   ];
   const [presentationSettings, setPresentationSettings] =
     useState<ChartPresentationSettings>({
-      clusterCount: 2,
+      eps: 8,
       dataTicks: values.length,
       mode: "multiline",
-      ignoreBoringDataMode: "off",
+      ignoreBoringDataMode: "standard",
+      meanRange: 0.1,
+      tickRange: 8,
     });
 
   const { aggregated, colsAccordingToAggregation, yDomain } = aggregatorB(
@@ -154,24 +156,17 @@ export const MultiAggregatedLineChart = () => {
   return (
     <div className="container w-full my-2 flex flex-col flex-wrap gap-2">
       <div className="flex flex-row justify-between gap-4 items-center">
-        <div>Ignored {boringDataCount} entries</div>
+        <div>
+          Ignored {boringDataCount} entries. Showing {aggregated.length}{" "}
+          clusters.
+        </div>
         <ClusterChartPreferencesPopover
           settings={presentationSettings}
           setSettings={setPresentationSettings}
         />
         {/* <pre>{JSON.stringify(presentationSettings)}</pre> */}
       </div>
-      {/* <div className="w-full my-2 flex flex-row flex-wrap gap-2"> */}
-      {aggregated.map((val, index) => (
-        <AggregatedLineChart
-          values={val}
-          key={index}
-          className={colors[index % colors.length]}
-          yDomain={yDomain}
-          presentationSettings={presentationSettings}
-        />
-      ))}
-      {/* </div> */}
+
       <div className="flex flex-row flex-shrink items-center rounded-sm overflow-hidden">
         {colsAccordingToAggregation.map(([name, styleGroup], index) => (
           <TooltipProvider key={`${name}-${index}`}>
@@ -188,6 +183,17 @@ export const MultiAggregatedLineChart = () => {
               <TooltipContent>{name}</TooltipContent>
             </Tooltip>
           </TooltipProvider>
+        ))}
+      </div>
+      <div className="flex-1 flex flex-col gap-2 overflow-scroll">
+        {aggregated.map((val, index) => (
+          <AggregatedLineChart
+            values={val}
+            key={index}
+            className={colors[index % colors.length]}
+            yDomain={yDomain}
+            presentationSettings={presentationSettings}
+          />
         ))}
       </div>
     </div>
@@ -241,7 +247,7 @@ const AggregatedLineChart = ({
     <VegaLite
       spec={spec}
       style={{ cursor: "pointer" }}
-      className={cn("flex-1", className, "rounded-sm overflow-hidden")}
+      className={cn("flex-1", className, "rounded-sm overflow-hidden min-h-40")}
     />
   );
 };
