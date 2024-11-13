@@ -26,7 +26,10 @@ export type ChartPresentationSettings = (
          */
         tickRange: number;
 
-        // TODO implement a "saveScreenSpace" option
+        /**
+         * This should indicate that the screen space should be saved be not displaying boring data.
+         */
+        saveScreenSpace: boolean;
       }
   ) & {
     mode: "multiline" | "envelope";
@@ -189,12 +192,12 @@ export const aggregatorB = (
         entryIndex++
       ) {
         const timestamp = allTimestamps[entryIndex];
-        const isUnimportantData = commonBoringData.includes(timestamp);
+        const isBoringEntry = commonBoringData.includes(timestamp);
 
-        if (isUnimportantData) {
+        if (isBoringEntry) {
           // TODO: Make this optional based on the "saveScreenSpace" variable
           // If previous value was also boring, we don't insert even a new value. If prev was not boring, this is just first one being boring so it should be having only nullable values in order to show some "empty space" to the user later on.
-          if (wasPrevBoring) {
+          if (wasPrevBoring && settings.saveScreenSpace) {
           } else {
             // Set value undefined for each cluster values
             for (
@@ -220,9 +223,8 @@ export const aggregatorB = (
                 undefinedObject as Record<string, number>
               );
             }
-
-            wasPrevBoring = true;
           }
+          wasPrevBoring = true;
         } else {
           for (
             let clusterIndex = 0;

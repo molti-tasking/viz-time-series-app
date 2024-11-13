@@ -6,16 +6,17 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ClusterChartPreferences } from "@/lib/clustering";
 import { cn } from "@/lib/utils";
 import { ChevronDownIcon } from "lucide-react";
 import React, { useState } from "react";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
+import { ChartPresentationSettings } from "@/lib/clusteringB";
+import { Checkbox } from "./ui/checkbox";
 
 interface ClusterChartPreferencesPopoverProps {
-  settings: ClusterChartPreferences;
-  setSettings: React.Dispatch<React.SetStateAction<ClusterChartPreferences>>;
+  settings: ChartPresentationSettings;
+  setSettings: React.Dispatch<React.SetStateAction<ChartPresentationSettings>>;
 }
 
 export function ClusterChartPreferencesPopover(
@@ -36,13 +37,13 @@ export function ClusterChartPreferencesPopover(
   );
 }
 
-const chartViewOptions: Record<ClusterChartPreferences["mode"], string> = {
+const chartViewOptions: Record<ChartPresentationSettings["mode"], string> = {
   multiline: "Multiline",
   envelope: "Envelope",
 };
 
 const ignoreBoringDataModeOptions: Record<
-  ClusterChartPreferences["ignoreBoringDataMode"],
+  ChartPresentationSettings["ignoreBoringDataMode"],
   string
 > = {
   off: "Off",
@@ -124,7 +125,7 @@ const SettingsForm = ({
           onValueChange={(mode) =>
             setSettings((curr) => ({
               ...curr,
-              mode: mode as ClusterChartPreferences["mode"],
+              mode: mode as ChartPresentationSettings["mode"],
             }))
           }
         >
@@ -166,7 +167,7 @@ const SettingsForm = ({
           setSettings((curr) => ({
             ...curr,
             ignoreBoringDataMode:
-              mode as ClusterChartPreferences["ignoreBoringDataMode"],
+              mode as ChartPresentationSettings["ignoreBoringDataMode"],
           }))
         }
       >
@@ -177,52 +178,74 @@ const SettingsForm = ({
             </TabsTrigger>
           ))}
         </TabsList>
-        <TabsContent
-          value="standard"
-          className="grid w-full grid-cols-2 gap-2 items-start"
-        >
-          <div className="grid w-full max-w-sm items-center gap-1.5">
-            <Label htmlFor="meanRange">Relative mean range</Label>
-            <Input
-              type="number"
-              id="meanRange"
-              placeholder="Mean range"
-              step={0.05}
-              min={0.0}
-              max={0.9999}
-              value={"meanRange" in settings ? settings.meanRange : undefined}
-              onChange={(e) =>
-                setSettings((curr) => ({
-                  ...curr,
-                  meanRange: e.target.valueAsNumber,
-                }))
-              }
-            />
-            <p className={cn("text-sm text-muted-foreground")}>
-              Define the relative sensitivity in a way of how much data has to
-              be away from the mean of the respective data ticks in order to be
-              significant enough to be displayed.
-            </p>
-          </div>
+        <TabsContent value="standard" className="grid w-full gap-2">
+          <div className="grid w-full grid-cols-2 gap-2 items-start">
+            <div className="grid w-full max-w-sm items-center gap-1.5">
+              <Label htmlFor="meanRange">Relative mean range</Label>
+              <Input
+                type="number"
+                id="meanRange"
+                placeholder="Mean range"
+                step={0.05}
+                min={0.0}
+                max={0.9999}
+                value={"meanRange" in settings ? settings.meanRange : undefined}
+                onChange={(e) =>
+                  setSettings((curr) => ({
+                    ...curr,
+                    meanRange: e.target.valueAsNumber,
+                  }))
+                }
+              />
+              <p className={cn("text-sm text-muted-foreground")}>
+                Define the relative sensitivity in a way of how much data has to
+                be away from the mean of the respective data ticks in order to
+                be significant enough to be displayed.
+              </p>
+            </div>
 
-          <div className="grid w-full max-w-sm items-center gap-1.5">
-            <Label htmlFor="tickRange">Tick range</Label>
-            <Input
-              type="number"
-              id="tickRange"
-              placeholder="Tick range"
-              value={"tickRange" in settings ? settings.tickRange : undefined}
-              onChange={(e) =>
+            <div className="grid w-full max-w-sm items-center gap-1.5">
+              <Label htmlFor="tickRange">Tick range</Label>
+              <Input
+                type="number"
+                id="tickRange"
+                placeholder="Tick range"
+                value={"tickRange" in settings ? settings.tickRange : undefined}
+                onChange={(e) =>
+                  setSettings((curr) => ({
+                    ...curr,
+                    tickRange: e.target.valueAsNumber,
+                  }))
+                }
+              />
+              <p className={cn("text-sm text-muted-foreground")}>
+                Define the amount of data points that are considered to define a
+                mean value.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="saveScreenSpace"
+              checked={
+                "saveScreenSpace" in settings
+                  ? settings.saveScreenSpace
+                  : undefined
+              }
+              onCheckedChange={(checked) =>
                 setSettings((curr) => ({
                   ...curr,
-                  tickRange: e.target.valueAsNumber,
+                  saveScreenSpace: checked,
                 }))
               }
             />
-            <p className={cn("text-sm text-muted-foreground")}>
-              Define the amount of data points that are considered to define a
-              mean value.
-            </p>
+            <label
+              htmlFor="saveScreenSpace"
+              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              Save screen space but hiding time periods without significant
+              data.
+            </label>
           </div>
         </TabsContent>
       </Tabs>

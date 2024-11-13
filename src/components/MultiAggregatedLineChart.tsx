@@ -1,5 +1,4 @@
-import { type ClusterChartPreferences } from "@/lib/clustering";
-import { aggregatorB } from "@/lib/clusteringB";
+import { type ChartPresentationSettings, aggregatorB } from "@/lib/clusteringB";
 import { cn, deepMerge } from "@/lib/utils";
 import { useDataStore } from "@/store/dataStore";
 import { type ClassValue } from "clsx";
@@ -14,7 +13,7 @@ import {
 } from "./ui/tooltip";
 
 const chartModeSpecs: Record<
-  ClusterChartPreferences["mode"],
+  ChartPresentationSettings["mode"],
   Partial<VisualizationSpec>
 > = {
   multiline: {
@@ -137,7 +136,7 @@ export const MultiAggregatedLineChart = () => {
     "bg-sky-200",
   ];
   const [presentationSettings, setPresentationSettings] =
-    useState<ClusterChartPreferences>({
+    useState<ChartPresentationSettings>({
       clusterCount: 2,
       dataTicks: values.length,
       mode: "multiline",
@@ -169,7 +168,7 @@ export const MultiAggregatedLineChart = () => {
           key={index}
           className={colors[index % colors.length]}
           yDomain={yDomain}
-          mode={presentationSettings.mode}
+          presentationSettings={presentationSettings}
         />
       ))}
       {/* </div> */}
@@ -198,12 +197,12 @@ const AggregatedLineChart = ({
   values,
   className,
   yDomain,
-  mode,
+  presentationSettings,
 }: {
   values: Record<string, number>[];
   className: ClassValue;
   yDomain: [number, number];
-  mode: ClusterChartPreferences["mode"];
+  presentationSettings: ChartPresentationSettings;
 }) => {
   const dimensions = values.length
     ? Object.keys(values[0]).filter((e) => e !== "timestamp")
@@ -219,7 +218,11 @@ const AggregatedLineChart = ({
     encoding: {
       x: {
         field: "timestamp",
-        type: "temporal",
+        type:
+          "saveScreenSpace" in presentationSettings &&
+          !!presentationSettings.saveScreenSpace
+            ? "ordinal"
+            : "temporal",
         title: "Time",
       },
       y: {
@@ -232,7 +235,7 @@ const AggregatedLineChart = ({
   };
 
   // I don't 100% know why, but as of now it was very important to keep this order of the specs how they are getting passed into the merge function. Otherwise, the vizualisation breaks.
-  const spec = deepMerge(dataSpec, chartModeSpecs[mode]);
+  const spec = deepMerge(dataSpec, chartModeSpecs[presentationSettings.mode]);
 
   return (
     <VegaLite
