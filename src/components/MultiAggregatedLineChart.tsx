@@ -1,4 +1,4 @@
-import { type ChartPresentationSettings, aggregatorB } from "@/lib/clusteringB";
+import { type ChartPresentationSettings } from "@/lib/clusteringB";
 import { cn, deepMerge } from "@/lib/utils";
 import { useRawDataStore } from "@/store/useRawDataStore";
 import { type ClassValue } from "clsx";
@@ -11,6 +11,8 @@ import {
   TooltipTrigger,
 } from "./ui/tooltip";
 import { useViewSettingsStore } from "@/store/useViewSettingsStore";
+import { useViewModelStore } from "@/store/useViewModelStore";
+import { useEffect } from "react";
 
 const chartModeSpecs: Record<
   ChartPresentationSettings["mode"],
@@ -117,8 +119,8 @@ const chartModeSpecs: Record<
 // TODO: Make this chart mostly recursive in a way that a user sees a subset whenever he selects one of those charts
 
 export const MultiAggregatedLineChart = () => {
-  const dimensions = useRawDataStore((state) => state.dimensions);
   const values = useRawDataStore((state) => state.values);
+  // const dimensions = useRawDataStore((state) => state.dimensions);
 
   const colors: ClassValue[] = [
     "bg-red-200",
@@ -136,16 +138,23 @@ export const MultiAggregatedLineChart = () => {
     "bg-sky-200",
   ];
   const presentationSettings = useViewSettingsStore();
-  console.time("Aggregator duration");
 
-  const { aggregated, colsAccordingToAggregation, yDomain } = aggregatorB(
-    values,
-    dimensions,
-    presentationSettings
-  );
-  console.timeEnd("Aggregator duration");
+  const { aggregated, colsAccordingToAggregation, yDomain, processData } =
+    useViewModelStore();
 
-  const boringDataCount = values.length - aggregated[0].length;
+  // console.time("Rendering process duration");
+  // const { aggregated, colsAccordingToAggregation, yDomain } = aggregatorB(
+  //   values,
+  //   dimensions,
+  //   presentationSettings
+  // );
+  // console.timeEnd("Rendering process duration");
+
+  useEffect(() => {
+    processData();
+  }, [presentationSettings, values]);
+
+  const boringDataCount = values.length - aggregated?.[0]?.length;
 
   return (
     <div className="container w-full my-2 flex flex-col flex-wrap gap-2">
@@ -157,7 +166,6 @@ export const MultiAggregatedLineChart = () => {
         <ClusterChartPreferencesPopover />
         {/* <pre>{JSON.stringify(presentationSettings)}</pre> */}
       </div>
-
       <div className="flex flex-row flex-shrink items-center rounded-sm overflow-hidden">
         {colsAccordingToAggregation.map(([name, styleGroup], index) => (
           <TooltipProvider key={`${name}-${index}`}>

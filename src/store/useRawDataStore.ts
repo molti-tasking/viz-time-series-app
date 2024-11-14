@@ -15,27 +15,29 @@ interface DataStore {
   ) => void;
 }
 
-export const useRawDataStore = create<DataStore>((set, get) => ({
-  mode: "random",
-  dimensions: [],
-  values: [],
-  streamingInterval: null,
-  intervalId: null,
+export const useRawDataStore = create<DataStore>((set, get) => {
+  return {
+    mode: "peaks",
+    dimensions: [],
+    values: [],
+    streamingInterval: null,
+    intervalId: null,
 
-  updateData: (mode, columnCount, rowCount, streamingInterval) => {
-    const { intervalId } = get();
-    if (intervalId) clearInterval(intervalId);
-    set({ mode, streamingInterval, values: [], dimensions: [] });
-    generateData(columnCount, rowCount);
-    if (streamingInterval) {
-      const newIntervalId = setInterval(() => {
-        console.log("Stream update");
-        streamDataUpdate();
-      }, streamingInterval);
-      set({ intervalId: newIntervalId });
-    }
-  },
-}));
+    updateData: (mode, columnCount, rowCount, streamingInterval) => {
+      const { intervalId } = get();
+      if (intervalId) clearInterval(intervalId);
+      set({ mode, streamingInterval, values: [], dimensions: [] });
+      generateData(columnCount, rowCount);
+      if (streamingInterval) {
+        const newIntervalId = setInterval(() => {
+          console.log("Stream update");
+          streamDataUpdate();
+        }, streamingInterval);
+        set({ intervalId: newIntervalId });
+      }
+    },
+  };
+});
 
 // ----------------
 // DATA GENERATION
