@@ -1,8 +1,7 @@
 import { type ChartPresentationSettings, aggregatorB } from "@/lib/clusteringB";
 import { cn, deepMerge } from "@/lib/utils";
-import { useDataStore } from "@/store/dataStore";
+import { useRawDataStore } from "@/store/useRawDataStore";
 import { type ClassValue } from "clsx";
-import { useState } from "react";
 import { VegaLite, type VisualizationSpec } from "react-vega";
 import { ClusterChartPreferencesPopover } from "./ClusterChartPreferencesPopover";
 import {
@@ -11,6 +10,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "./ui/tooltip";
+import { useViewSettingsStore } from "@/store/useViewSettingsStore";
 
 const chartModeSpecs: Record<
   ChartPresentationSettings["mode"],
@@ -117,8 +117,8 @@ const chartModeSpecs: Record<
 // TODO: Make this chart mostly recursive in a way that a user sees a subset whenever he selects one of those charts
 
 export const MultiAggregatedLineChart = () => {
-  const dimensions = useDataStore((state) => state.dimensions);
-  const values = useDataStore((state) => state.values);
+  const dimensions = useRawDataStore((state) => state.dimensions);
+  const values = useRawDataStore((state) => state.values);
 
   const colors: ClassValue[] = [
     "bg-red-200",
@@ -135,21 +135,15 @@ export const MultiAggregatedLineChart = () => {
     "bg-amber-200",
     "bg-sky-200",
   ];
-  const [presentationSettings, setPresentationSettings] =
-    useState<ChartPresentationSettings>({
-      eps: 8,
-      dataTicks: values.length,
-      mode: "multiline",
-      ignoreBoringDataMode: "standard",
-      meanRange: 0.1,
-      tickRange: 8,
-    });
+  const presentationSettings = useViewSettingsStore();
+  console.time("Aggregator duration");
 
   const { aggregated, colsAccordingToAggregation, yDomain } = aggregatorB(
     values,
     dimensions,
     presentationSettings
   );
+  console.timeEnd("Aggregator duration");
 
   const boringDataCount = values.length - aggregated[0].length;
 
@@ -160,10 +154,7 @@ export const MultiAggregatedLineChart = () => {
           Ignored {boringDataCount} entries. Showing {aggregated.length}{" "}
           clusters.
         </div>
-        <ClusterChartPreferencesPopover
-          settings={presentationSettings}
-          setSettings={setPresentationSettings}
-        />
+        <ClusterChartPreferencesPopover />
         {/* <pre>{JSON.stringify(presentationSettings)}</pre> */}
       </div>
 

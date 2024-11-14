@@ -1,9 +1,9 @@
 import { Button } from "@/components/ui/button";
-import { useDataStore } from "@/store/dataStore";
+import { useRawDataStore } from "@/store/useRawDataStore";
 
 export default function Home() {
-  const values = useDataStore((state) => state.values);
-  const updateData = useDataStore((state) => state.updateData);
+  const values = useRawDataStore((state) => state.values);
+  const updateData = useRawDataStore((state) => state.updateData);
   const generateInitialData = () => {
     updateData("peaks", 12, 40);
   };

@@ -12,7 +12,7 @@ import {
 } from "@babylonjs/core";
 import { useEffect, useRef } from "react";
 // import * as anu from "../../../anu/";
-import { useDataStore } from "@/store/dataStore";
+import { useRawDataStore } from "@/store/useRawDataStore";
 import * as anu from "@jpmorganchase/anu";
 import { extent, quantile, scaleLinear, scalePoint, utcFormat } from "d3";
 
@@ -155,8 +155,8 @@ const onSceneReady = (
 };
 
 export const Viz3D = () => {
-  const dimensions = useDataStore((state) => state.dimensions);
-  const values = useDataStore((state) => state.values);
+  const dimensions = useRawDataStore((state) => state.dimensions);
+  const values = useRawDataStore((state) => state.values);
 
   return (
     <SceneComponent

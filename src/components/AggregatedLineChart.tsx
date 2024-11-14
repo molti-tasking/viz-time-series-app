@@ -1,9 +1,9 @@
-import { useDataStore } from "@/store/dataStore";
+import { useRawDataStore } from "@/store/useRawDataStore";
 import { VegaLite, type VisualizationSpec } from "react-vega";
 
 export const AggregatedLineChart = () => {
-  const dimensions = useDataStore((state) => state.dimensions);
-  const values = useDataStore((state) => state.values);
+  const dimensions = useRawDataStore((state) => state.dimensions);
+  const values = useRawDataStore((state) => state.values);
 
   const spec: VisualizationSpec = {
     $schema: "https://vega.github.io/schema/vega-lite/v5.json",

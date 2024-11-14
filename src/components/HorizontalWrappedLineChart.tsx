@@ -1,6 +1,6 @@
 import { cn, deepMerge } from "@/lib/utils";
 import { type DataCompressionPreferences, wrapper } from "@/lib/wrapping";
-import { useDataStore } from "@/store/dataStore";
+import { useRawDataStore } from "@/store/useRawDataStore";
 import { type ClassValue } from "clsx";
 import { useState } from "react";
 import { VegaLite, type VisualizationSpec } from "react-vega";
@@ -111,8 +111,8 @@ const chartModeSpecs: Record<
 // TODO: Make this chart mostly recursive in a way that a user sees a subset whenever he selects one of those charts
 
 export const HorizontalWrappedLineChart = () => {
-  const dimensions = useDataStore((state) => state.dimensions);
-  const values = useDataStore((state) => state.values);
+  const dimensions = useRawDataStore((state) => state.dimensions);
+  const values = useRawDataStore((state) => state.values);
 
   const [presentationSettings, setPresentationSettings] =
     useState<DataCompressionPreferences>({

@@ -8,20 +8,14 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 import { ChevronDownIcon } from "lucide-react";
-import React, { useState } from "react";
+import { useState } from "react";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { ChartPresentationSettings } from "@/lib/clusteringB";
 import { Checkbox } from "./ui/checkbox";
+import { useViewSettingsStore } from "@/store/useViewSettingsStore";
 
-interface ClusterChartPreferencesPopoverProps {
-  settings: ChartPresentationSettings;
-  setSettings: React.Dispatch<React.SetStateAction<ChartPresentationSettings>>;
-}
-
-export function ClusterChartPreferencesPopover(
-  props: ClusterChartPreferencesPopoverProps
-) {
+export function ClusterChartPreferencesPopover() {
   const [open, setOpen] = useState(false);
   return (
     <Popover open={open} onOpenChange={setOpen} modal>
@@ -31,7 +25,7 @@ export function ClusterChartPreferencesPopover(
         </Button>
       </PopoverTrigger>
       <PopoverContent className="max-w-screen-sm w-full z-[2000]">
-        <SettingsForm onClose={() => setOpen(false)} {...props} />
+        <SettingsForm onClose={() => setOpen(false)} />
       </PopoverContent>
     </Popover>
   );
@@ -50,13 +44,10 @@ const ignoreBoringDataModeOptions: Record<
   standard: "Standard",
 };
 
-const SettingsForm = ({
-  onClose,
-  settings,
-  setSettings,
-}: {
-  onClose: () => void;
-} & ClusterChartPreferencesPopoverProps) => {
+const SettingsForm = ({ onClose }: { onClose: () => void }) => {
+  const viewSettings = useViewSettingsStore();
+  const { updateSettings, ...settings } = viewSettings;
+
   return (
     <div className="grid gap-4">
       <div className="space-y-2">
@@ -80,7 +71,7 @@ const SettingsForm = ({
               "clusterCount" in settings ? settings.clusterCount : undefined
             }
             onChange={(e) =>
-              setSettings((curr) => ({
+              updateSettings((curr) => ({
                 ...curr,
                 eps: undefined,
                 clusterCount: e.target.valueAsNumber ?? undefined,
@@ -103,7 +94,7 @@ const SettingsForm = ({
             disabled={"clusterCount" in settings && !!settings.clusterCount}
             value={"eps" in settings ? settings.eps : undefined}
             onChange={(e) =>
-              setSettings((curr) => ({
+              updateSettings((curr) => ({
                 ...curr,
                 clusterCount: undefined,
                 eps: e.target.valueAsNumber ?? undefined,
@@ -123,7 +114,7 @@ const SettingsForm = ({
           id="chartViewMode"
           value={settings.mode}
           onValueChange={(mode) =>
-            setSettings((curr) => ({
+            updateSettings((curr) => ({
               ...curr,
               mode: mode as ChartPresentationSettings["mode"],
             }))
@@ -147,7 +138,7 @@ const SettingsForm = ({
           placeholder="Data Ticks"
           value={settings.dataTicks}
           onChange={(e) =>
-            setSettings((curr) => ({
+            updateSettings((curr) => ({
               ...curr,
               dataTicks: e.target.valueAsNumber,
             }))
@@ -164,7 +155,7 @@ const SettingsForm = ({
         id="ignoreBoringDataMode"
         value={settings.ignoreBoringDataMode}
         onValueChange={(mode) =>
-          setSettings((curr) => ({
+          updateSettings((curr) => ({
             ...curr,
             ignoreBoringDataMode:
               mode as ChartPresentationSettings["ignoreBoringDataMode"],
@@ -191,7 +182,7 @@ const SettingsForm = ({
                 max={0.9999}
                 value={"meanRange" in settings ? settings.meanRange : undefined}
                 onChange={(e) =>
-                  setSettings((curr) => ({
+                  updateSettings((curr) => ({
                     ...curr,
                     meanRange: e.target.valueAsNumber,
                   }))
@@ -212,7 +203,7 @@ const SettingsForm = ({
                 placeholder="Tick range"
                 value={"tickRange" in settings ? settings.tickRange : undefined}
                 onChange={(e) =>
-                  setSettings((curr) => ({
+                  updateSettings((curr) => ({
                     ...curr,
                     tickRange: e.target.valueAsNumber,
                   }))
@@ -233,7 +224,7 @@ const SettingsForm = ({
                   : undefined
               }
               onCheckedChange={(checked) =>
-                setSettings((curr) => ({
+                updateSettings((curr) => ({
                   ...curr,
                   saveScreenSpace: checked,
                 }))
@@ -260,7 +251,7 @@ const SettingsForm = ({
               placeholder="Start Time"
               value={settings.timeScale?.from}
               onChange={(e) =>
-                setSettings((curr) => ({
+                updateSettings((curr) => ({
                   ...curr,
                   timeScale: {
                     ...curr.timeScale,

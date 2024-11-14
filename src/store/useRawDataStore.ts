@@ -15,7 +15,7 @@ interface DataStore {
   ) => void;
 }
 
-export const useDataStore = create<DataStore>((set, get) => ({
+export const useRawDataStore = create<DataStore>((set, get) => ({
   mode: "random",
   dimensions: [],
   values: [],
@@ -42,7 +42,7 @@ export const useDataStore = create<DataStore>((set, get) => ({
 // ----------------
 
 const generateData = (columns: number, rows: number, min = 5, max = 10) => {
-  const mode = useDataStore.getState().mode;
+  const mode = useRawDataStore.getState().mode;
   const newColumns = [
     "timestamp",
     ...Array.from({ length: columns - 1 }, (_, index) => `Col ${index + 1}`),
@@ -60,14 +60,14 @@ const generateData = (columns: number, rows: number, min = 5, max = 10) => {
       {} as Record<string, number>
     )
   );
-  useDataStore.setState({
+  useRawDataStore.setState({
     values,
     dimensions: newColumns.filter((col) => col !== "timestamp"),
   });
 };
 
 const streamDataUpdate = () => {
-  const { values, mode } = useDataStore.getState();
+  const { values, mode } = useRawDataStore.getState();
   const lastRow = values[values.length - 1];
 
   if (!lastRow) return;
@@ -96,7 +96,7 @@ const streamDataUpdate = () => {
   }
 
   // Add new row to values
-  useDataStore.setState((state) => ({
+  useRawDataStore.setState((state) => ({
     values: [...state.values, newRow],
   }));
 };

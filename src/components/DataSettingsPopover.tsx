@@ -13,7 +13,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { useDataStore } from "@/store/dataStore";
+import { useRawDataStore } from "@/store/useRawDataStore";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ChevronDownIcon } from "lucide-react";
 import { useState } from "react";
@@ -48,12 +48,12 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 const SettingsForm = ({ onClose }: { onClose: () => void }) => {
-  const dimensions = useDataStore((state) => state.dimensions);
-  const values = useDataStore((state) => state.values);
-  const streamingInterval = useDataStore((state) => state.streamingInterval);
-  const mode = useDataStore((state) => state.mode);
+  const dimensions = useRawDataStore((state) => state.dimensions);
+  const values = useRawDataStore((state) => state.values);
+  const streamingInterval = useRawDataStore((state) => state.streamingInterval);
+  const mode = useRawDataStore((state) => state.mode);
 
-  const updateData = useDataStore((state) => state.updateData);
+  const updateData = useRawDataStore((state) => state.updateData);
 
   const defaultValues = {
     mode: mode,
