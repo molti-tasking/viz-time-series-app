@@ -1,7 +1,6 @@
 import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { HorizontalWrappedLineChart } from "./components/HorizontalWrappedLineChart";
 import ErrorPage from "./error-page";
 import "./index.css";
 import AggrLine from "./routes/aggregated-line";
@@ -33,11 +32,6 @@ const router = createBrowserRouter([
       {
         path: "multi-aggregated-line",
         element: <MutliAggregatedLine />,
-        errorElement: <ErrorPage />,
-      },
-      {
-        path: "wrapped-line",
-        element: <HorizontalWrappedLineChart />,
         errorElement: <ErrorPage />,
       },
     ],
