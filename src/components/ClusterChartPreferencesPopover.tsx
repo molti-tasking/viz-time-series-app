@@ -11,9 +11,9 @@ import { ChevronDownIcon } from "lucide-react";
 import { useState } from "react";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
-import { ChartPresentationSettings } from "@/lib/clusteringB";
 import { Checkbox } from "./ui/checkbox";
 import { useViewSettingsStore } from "@/store/useViewSettingsStore";
+import { ChartPresentationSettings } from "@/lib/ChartPresentationSettings";
 
 export function ClusterChartPreferencesPopover() {
   const [open, setOpen] = useState(false);
@@ -34,6 +34,7 @@ export function ClusterChartPreferencesPopover() {
 const chartViewOptions: Record<ChartPresentationSettings["mode"], string> = {
   multiline: "Multiline",
   envelope: "Envelope",
+  plotly: "Plotly (GL)",
 };
 
 const ignoreBoringDataModeOptions: Record<
