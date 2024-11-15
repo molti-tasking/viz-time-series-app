@@ -2,6 +2,7 @@
 import { expect, test } from "vitest";
 import { aggregator } from "./clustering";
 import { aggregatorB } from "./clusteringB.ts";
+import { ChartPresentationSettings } from "./ChartPresentationSettings.ts";
 /*
 test("Test the regrouping", () => {
   const input = [
@@ -521,10 +522,11 @@ test("Test the DBSCAN", () => {
     "Col 7",
     "Col 8",
   ];
-  const presentationSettings = {
+  const presentationSettings: ChartPresentationSettings = {
     dataTicks: 20,
     mode: "multiline" as const,
     eps: 15,
+    ignoreBoringDataMode: "off",
   };
 
   const expectedResult = {
@@ -1272,10 +1274,11 @@ test("Test the DBSCAN with second impl", () => {
     "Col 7",
     "Col 8",
   ];
-  const presentationSettings = {
+  const presentationSettings: ChartPresentationSettings = {
     dataTicks: 20,
     mode: "multiline" as const,
     eps: 15,
+    ignoreBoringDataMode: "off",
   };
 
   const expectedResult = {

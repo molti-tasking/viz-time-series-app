@@ -41,7 +41,6 @@ test("Test wrapping on a one dimensional array with a range of 3 data points", (
   const { filteredData } = wrapper(input, ["Col 1"], {
     meanRange: 0.2,
     tickRange: 3,
-    mode: "multiline",
   });
 
   // Assert
@@ -87,7 +86,6 @@ test("Test wrapping on a one dimensional array with a range of 5 data points", (
   const { filteredData } = wrapper(input, ["Col 1"], {
     meanRange: 0.2,
     tickRange: 5,
-    mode: "envelope",
   });
 
   // Assert

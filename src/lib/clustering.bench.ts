@@ -1,3 +1,4 @@
+import { ChartPresentationSettings } from "./ChartPresentationSettings.ts";
 import { aggregator } from "./clustering.ts";
 import { aggregatorB } from "./clusteringB.ts";
 
@@ -431,10 +432,11 @@ const dimensions = [
   "Col 7",
   "Col 8",
 ];
-const presentationSettings = {
+const presentationSettings: ChartPresentationSettings = {
   dataTicks: 20,
   mode: "multiline" as const,
   eps: 15,
+  ignoreBoringDataMode: "off",
 };
 
 // @ts-expect-error We only use this deno benchmarking locally to measure performance of different implementations
