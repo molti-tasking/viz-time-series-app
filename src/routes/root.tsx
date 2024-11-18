@@ -8,7 +8,6 @@ export default function Root() {
     { title: "2D Multi Line", href: "multi-line" },
     { title: "2D Aggregated", href: "aggregated-line" },
     { title: "2D Multi Aggregated", href: "multi-aggregated-line" },
-    { title: "2D Wrapped Line", href: "wrapped-line" },
   ];
 
   return (
