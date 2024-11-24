@@ -1,9 +1,9 @@
 import * as Comlink from "comlink";
-import { aggregatorB } from "./clusteringB";
+import { aggregator } from "./clustering";
 
 // Define the functions that will be available in the worker
 const workerFunctions = {
-  aggregatorB,
+  aggregatorB: aggregator,
 };
 
 export type ClusteringWorker = typeof workerFunctions;

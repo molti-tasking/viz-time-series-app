@@ -1,6 +1,4 @@
 import { ChartPresentationSettings } from "./ChartPresentationSettings";
-import { findCommonElements } from "./findCommonElements";
-import { findBoringTimestamps } from "./wrapping";
 
 type AggregatedProps = {
   aggregated: Record<string, number>[][];
@@ -14,38 +12,28 @@ type AggregatedProps = {
  * @param values A list of multivariate time series entries of type Record<string, number>[] where each record contains a "timestamp" and multiple columns that are the actual time series.
  * @param dimensions Basically the extracted keys of the values and it can be considered the names of the time series, but it is not containing the "timestamp" key itself.
  * @param settings containing parameters that define how the data should be processed and grouped.
- * @returns
+ * @deprecated This is not used because it's to slow
  */
-export const aggregatorB = (
+export const aggregatorUnused = (
   rawData: Record<string, number>[],
   dimensions: string[],
   settings: ChartPresentationSettings
 ): AggregatedProps => {
-  // ----------------
-  // Filtering data to time
-  // ----------------
+  console.count("Called aggregator");
   let dataToBeClustered = rawData;
   if (settings.dataTicks) {
     dataToBeClustered = rawData.slice(-1 * settings.dataTicks);
   }
 
-  // ----------------
-  // Clustering data
-  // ----------------
-
   let aggregated: Record<string, number>[][] = [dataToBeClustered];
   if ("eps" in settings && !!settings.eps) {
     // Here we are first putting all the different entries that are grouped by timestamp into another representation which is grouped by column. This way it will be easier to calculate a distance between those later on.
-    // Convert entries grouped by timestamp into a representation grouped by column for easier distance calculation
     const allTimeSeries: [string, Record<number, number>][] = dimensions.map(
       (dimension) => {
-        const timeSeries: Record<number, number> = {};
-
-        for (let i = 0; i < dataToBeClustered.length; i++) {
-          const curr = dataToBeClustered[i];
-          timeSeries[curr.timestamp] = curr[dimension];
-        }
-
+        const timeSeries = dataToBeClustered.reduce(
+          (prev, curr) => ({ ...prev, [curr.timestamp]: curr[dimension] }),
+          {}
+        );
         return [dimension, timeSeries];
       }
     );
@@ -55,42 +43,33 @@ export const aggregatorB = (
       allTimeSeries,
       settings.eps
     );
-
-    const timelineNameCount = clusters.reduce(
-      (prev, curr) => prev + curr.length,
-      0
+    const timelineNames = clusters.flatMap((entry) =>
+      entry.flatMap(([entry]) => entry)
     );
 
-    if (timelineNameCount !== dimensions.length) {
+    if (timelineNames.length !== dimensions.length) {
       alert("Somehow we have missing timelines");
     }
 
     // We have to bring these column grouped clusters now again in the structure that they are grouped by column. This way they are required in order to be displayed properly
     aggregated = clusters.map((cluster) => {
       const timestamps = Object.keys(cluster[0][1]);
-      const result = [];
-
-      for (let i = 0; i < timestamps.length; i++) {
-        const timestamp = Number(timestamps[i]);
-        const entry: Record<string, number> = { timestamp };
-
-        for (let j = 0; j < cluster.length; j++) {
-          const [colName, values] = cluster[j];
-          entry[colName] = values[timestamp];
-        }
-
-        result.push(entry);
-      }
-
-      return result;
+      return timestamps.map((timestamp) => {
+        return cluster.reduce(
+          (prev, [colName, values]) => ({
+            ...prev,
+            [colName]: values[Number(timestamp)],
+          }),
+          {
+            timestamp: Number(timestamp),
+          }
+        );
+      });
     });
   } else if ("clusterCount" in settings && !!settings.clusterCount) {
     aggregated = clustering(dataToBeClustered, settings.clusterCount);
   }
 
-  // ----------------
-  // Wrapping of boring data now after we clustered it.
-  // ----------------
   if (
     settings.ignoreBoringDataMode === "standard" &&
     "meanRange" in settings &&
@@ -98,117 +77,14 @@ export const aggregatorB = (
     "tickRange" in settings &&
     !!settings.tickRange
   ) {
-    // Map all cluster dimensions because we need them later in order to set the values to undefined if needed.
-    const clustersDimensions: string[][] = [];
-    for (
-      let clusterIndex = 0;
-      clusterIndex < aggregated.length;
-      clusterIndex++
-    ) {
-      const cluster = aggregated[clusterIndex];
-      const dims = Object.keys(cluster[0] || {}).filter(
-        (key) => key !== "timestamp"
-      );
-      clustersDimensions.push(dims);
-    }
-
+    // TODO Here start the cluster wrapping
+    // ----------------
+    // Starting the wrapping of unneeded data now after we clustered it.
+    // ----------------
     // 1. Get unimportant data areas for each cluster
-    const allBoringValues = aggregated.map((aggregatedValues, index) =>
-      findBoringTimestamps(
-        aggregatedValues,
-        clustersDimensions[index],
-        settings
-      )
-    );
     // 2. Get the unimportant data areas that all clusters have in common
-    const commonBoringData = findCommonElements(allBoringValues).sort();
-
     // 3. Set those data points to undefined
-
-    if (commonBoringData.length) {
-      // Filter all timestamps upfront for better readability
-      const allTimestamps = [];
-      for (
-        let entryIndex = 0;
-        entryIndex < aggregated[0].length;
-        entryIndex++
-      ) {
-        const element = aggregated[0][entryIndex];
-        allTimestamps.push(element["timestamp"]);
-      }
-
-      const newAggregated: Record<string, number>[][] = [];
-      for (
-        let clusterIndex = 0;
-        clusterIndex < aggregated.length;
-        clusterIndex++
-      ) {
-        newAggregated.push([]); // using this loop to also initialize the new aggregated empty array
-      }
-
-      let wasPrevBoring = false;
-      // IMPORTANT: We have to know that all aggregated clusters have the same timestamps and also all of them have to be in the same order!
-      for (
-        let entryIndex = 0;
-        entryIndex < allTimestamps.length;
-        entryIndex++
-      ) {
-        const timestamp = allTimestamps[entryIndex];
-        const isBoringEntry = commonBoringData.includes(timestamp);
-
-        if (isBoringEntry) {
-          // TODO: Make this optional based on the "saveScreenSpace" variable
-          // If previous value was also boring, we don't insert even a new value. If prev was not boring, this is just first one being boring so it should be having only nullable values in order to show some "empty space" to the user later on.
-          if (wasPrevBoring && settings.saveScreenSpace) {
-          } else {
-            // Set value undefined for each cluster values
-            for (
-              let clusterIndex = 0;
-              clusterIndex < aggregated.length;
-              clusterIndex++
-            ) {
-              // This has to be defined like this in order to create a new object, rather than just copying the reference.
-              const undefinedObject: Record<string, number | undefined> = {
-                ...aggregated[clusterIndex][entryIndex],
-              };
-              const clusterDimensions = clustersDimensions[clusterIndex];
-              for (
-                let dimensionIndex = 0;
-                dimensionIndex < clusterDimensions.length;
-                dimensionIndex++
-              ) {
-                const dimension = clusterDimensions[dimensionIndex];
-                undefinedObject[dimension] = undefined;
-              }
-
-              newAggregated[clusterIndex].push(
-                undefinedObject as Record<string, number>
-              );
-            }
-          }
-          wasPrevBoring = true;
-        } else {
-          for (
-            let clusterIndex = 0;
-            clusterIndex < aggregated.length;
-            clusterIndex++
-          ) {
-            // Value is not boring, it is significant so we add to new aggregated values
-            newAggregated[clusterIndex].push(
-              aggregated[clusterIndex][entryIndex]
-            );
-          }
-          wasPrevBoring = false;
-        }
-      }
-
-      aggregated = newAggregated;
-    }
   }
-
-  // ----------------
-  // Getting meta data, like all cols and y-domain
-  // ----------------
 
   const colsAccordingToAggregation: [string, number][] = dimensions.map(
     (val) => [
@@ -223,7 +99,6 @@ export const aggregatorB = (
       key === "timestamp" ? [] : [value]
     )
   );
-
   const yMin = Math.min(...allValues);
   const yMax = Math.max(...allValues);
   const yDomain: [number, number] = [yMin, yMax];
@@ -372,4 +247,48 @@ const clusteringDBSCAN = (
   }
 
   return clusters;
+};
+
+/**
+ * We have to bring these column-grouped clusters now again in the structure that they are grouped by timestamp. This way they are required in order to be displayed properly
+ *
+ * @param clusters grouped by column clusters
+ * @returns
+ */
+export const regroupClustersA = (
+  clusters: [string, Record<number, number>][][]
+): Record<string, number>[][] => {
+  return clusters.map((cluster) => {
+    const timestamps = Object.keys(cluster[0][1]);
+    return timestamps.map((timestamp) => {
+      return cluster.reduce(
+        (prev, [colName, values]) => ({
+          ...prev,
+          [colName]: values[Number(timestamp)],
+        }),
+        {
+          timestamp: Number(timestamp),
+        }
+      );
+    });
+  });
+};
+
+export const regroupClustersB = (
+  clusters: [string, Record<number, number>][][]
+): Record<string, number>[][] => {
+  return clusters.map((cluster) => {
+    const timestamps = Object.keys(cluster[0][1]);
+    return timestamps.map((timestamp) => {
+      return cluster.reduce(
+        (prev, [colName, values]) => ({
+          ...prev,
+          [colName]: values[Number(timestamp)],
+        }),
+        {
+          timestamp: Number(timestamp),
+        }
+      );
+    });
+  });
 };

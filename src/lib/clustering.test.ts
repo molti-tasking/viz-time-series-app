@@ -1,8 +1,8 @@
 // sum.test.js
 import { expect, test } from "vitest";
-import { aggregator } from "./clustering";
-import { aggregatorB } from "./clusteringB.ts";
 import { ChartPresentationSettings } from "./ChartPresentationSettings.ts";
+import { aggregator } from "./clustering.ts";
+import { aggregatorUnused } from "./clusteringUnused.ts";
 /*
 test("Test the regrouping", () => {
   const input = [
@@ -836,7 +836,11 @@ test("Test the DBSCAN", () => {
   };
 
   // ACT
-  const grouped = aggregator(inputValues, dimensions, presentationSettings);
+  const grouped = aggregatorUnused(
+    inputValues,
+    dimensions,
+    presentationSettings
+  );
 
   // ASSERT
   expect(grouped).toStrictEqual(expectedResult);
@@ -1588,7 +1592,7 @@ test("Test the DBSCAN with second impl", () => {
   };
 
   // ACT
-  const grouped = aggregatorB(inputValues, dimensions, presentationSettings);
+  const grouped = aggregator(inputValues, dimensions, presentationSettings);
 
   // ASSERT
   expect(grouped).toStrictEqual(expectedResult);

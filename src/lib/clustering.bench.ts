@@ -1,6 +1,6 @@
 import { ChartPresentationSettings } from "./ChartPresentationSettings.ts";
 import { aggregator } from "./clustering.ts";
-import { aggregatorB } from "./clusteringB.ts";
+import { aggregatorUnused } from "./clusteringUnused.ts";
 
 const inputValues = [
   {
@@ -443,7 +443,7 @@ const presentationSettings: ChartPresentationSettings = {
 Deno.bench({
   name: "benchmark current aggregation function",
   fn() {
-    aggregator(inputValues, dimensions, presentationSettings);
+    aggregatorUnused(inputValues, dimensions, presentationSettings);
   },
 });
 
@@ -451,6 +451,6 @@ Deno.bench({
 Deno.bench({
   name: "benchmark current aggregation function",
   fn() {
-    aggregatorB(inputValues, dimensions, presentationSettings);
+    aggregator(inputValues, dimensions, presentationSettings);
   },
 });
