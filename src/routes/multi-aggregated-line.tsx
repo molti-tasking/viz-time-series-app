@@ -6,8 +6,7 @@ import { useViewSettingsStore } from "@/store/useViewSettingsStore";
 
 export default function MutliAggregatedLine() {
   const mode = useViewSettingsStore((state) => state.mode);
-
-  const { aggregated } = useViewModelStore();
+  const aggregated = useViewModelStore((data) => data.aggregated);
 
   return (
     <div className="container w-full my-2 flex flex-col flex-wrap gap-2">

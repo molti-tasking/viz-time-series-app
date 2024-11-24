@@ -5,6 +5,7 @@ import { create } from "zustand";
 import { useRawDataStore } from "./useRawDataStore";
 import { useViewSettingsStore } from "./useViewSettingsStore";
 
+import { ClusterView } from "@/lib/clusteringOverTime";
 import Worker from "../lib/clustering.worker?worker";
 
 interface DataStore {
@@ -12,7 +13,13 @@ interface DataStore {
   yDomain: [number, number];
   colsAccordingToAggregation: [string, number][];
 
+  /**
+   * This data is needed only for certain views. It should only be calculated when needed.
+   */
+  clustersInTime: ClusterView[];
+
   processData: () => void;
+  processClustersInTimeData: () => void;
 }
 
 const workerInstance = new Worker({ name: "aggregator" });
@@ -22,10 +29,9 @@ export const useViewModelStore = create<DataStore>((set) => {
   console.log("init view model store");
 
   const throttledDataProcess = _.throttle(async () => {
-    console.count("Throttled process data");
     const timerName = Date.now();
 
-    console.time("ViewModel process duration " + String(timerName));
+    console.time("ViewModel basic data process duration " + String(timerName));
     const dimensions = useRawDataStore.getState().dimensions;
     const values = useRawDataStore.getState().values;
     const { updateSettings, ...presentationSettings } =
@@ -37,19 +43,45 @@ export const useViewModelStore = create<DataStore>((set) => {
       dimensions,
       presentationSettings
     );
-    console.timeEnd("ViewModel process duration " + String(timerName));
+    console.timeEnd(
+      "ViewModel basic data process duration " + String(timerName)
+    );
 
     set(aggregated);
   }, 2000);
+
+  const throttledClustersInTimeProcess = _.throttle(async () => {
+    const timerName = Date.now();
+
+    console.time(
+      "ViewModel cluster in time process duration " + String(timerName)
+    );
+    const dimensions = useRawDataStore.getState().dimensions;
+    const values = useRawDataStore.getState().values;
+    const { updateSettings, ...presentationSettings } =
+      useViewSettingsStore.getState();
+    console.log("Settings: ", presentationSettings);
+
+    const { clustersInTime } = await workerApi.clusteringOverTime(
+      values,
+      dimensions,
+      presentationSettings
+    );
+
+    console.timeEnd(
+      "ViewModel cluster in time process duration " + String(timerName)
+    );
+
+    set({ clustersInTime });
+  }, 10000);
 
   return {
     aggregated: [],
     yDomain: [0, 10],
     colsAccordingToAggregation: [],
+    clustersInTime: [],
 
-    processData: async () => {
-      console.count("Process data with worker");
-      throttledDataProcess();
-    },
+    processData: throttledDataProcess,
+    processClustersInTimeData: throttledClustersInTimeProcess,
   };
 });

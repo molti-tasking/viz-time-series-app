@@ -1,6 +1,6 @@
+import { ChartPresentationSettings } from "@/lib/ChartPresentationSettings";
 import { create } from "zustand";
 import { useRawDataStore } from "./useRawDataStore";
-import { ChartPresentationSettings } from "@/lib/ChartPresentationSettings";
 
 export type ViewSettingsStore = ChartPresentationSettings & {
   updateSettings: (
@@ -9,7 +9,7 @@ export type ViewSettingsStore = ChartPresentationSettings & {
 };
 
 export const useViewSettingsStore = create<ViewSettingsStore>((set, get) => {
-  const dataTicks = useRawDataStore.getState().values.length ?? 20;
+  const dataTicks = Math.min(useRawDataStore.getState().values.length ?? 50);
   return {
     eps: 8,
     dataTicks,

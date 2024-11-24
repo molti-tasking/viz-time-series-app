@@ -29,7 +29,9 @@ export const clusteringOverTime = (
   // ----------------
   // Clustering context window: The amount of data entries that should be taken into consideration for handling the clusters later on.
   // ----------------
-  const clusteringContextWindow = settings.dataTicks ?? 20; // 20 just as a dump fallback value
+  const clusteringContextWindow = !!settings.dataTicks
+    ? settings.dataTicks
+    : 20; // 20 just as a dump fallback value
 
   for (
     let dataEntryIndex = 0;
@@ -52,6 +54,7 @@ export const clusteringOverTime = (
         : "";
 
     const aggregated = clusteringData(dataToBeClustered, dimensions, settings);
+
     const clusters: [string, number][] = dimensions.map((val) => [
       val,
       aggregated.findIndex((entries) => Object.keys(entries[0]).includes(val)),

@@ -1,9 +1,11 @@
 import * as Comlink from "comlink";
 import { aggregator } from "./clustering";
+import { clusteringOverTime } from "./clusteringOverTime";
 
 // Define the functions that will be available in the worker
 const workerFunctions = {
   aggregator: aggregator,
+  clusteringOverTime: clusteringOverTime,
 };
 
 export type ClusteringWorker = typeof workerFunctions;
