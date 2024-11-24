@@ -6,14 +6,14 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ChartPresentationSettings } from "@/lib/ChartPresentationSettings";
 import { cn } from "@/lib/utils";
+import { useViewSettingsStore } from "@/store/useViewSettingsStore";
 import { ChevronDownIcon } from "lucide-react";
 import { useState } from "react";
+import { Checkbox } from "./ui/checkbox";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
-import { Checkbox } from "./ui/checkbox";
-import { useViewSettingsStore } from "@/store/useViewSettingsStore";
-import { ChartPresentationSettings } from "@/lib/ChartPresentationSettings";
 
 export function ClusterChartPreferencesPopover() {
   const [open, setOpen] = useState(false);
@@ -35,6 +35,7 @@ const chartViewOptions: Record<ChartPresentationSettings["mode"], string> = {
   multiline: "Multiline",
   envelope: "Envelope",
   plotly: "Plotly (GL)",
+  clusters: "Clusters (NEW)",
 };
 
 const ignoreBoringDataModeOptions: Record<
@@ -110,6 +111,26 @@ const SettingsForm = ({ onClose }: { onClose: () => void }) => {
       </div>
 
       <div className="grid w-full max-w-sm items-center gap-1.5">
+        <Label htmlFor="dataTicks">Data Ticks</Label>
+        <Input
+          type="number"
+          id="dataTicks"
+          placeholder="Data Ticks"
+          value={settings.dataTicks}
+          onChange={(e) =>
+            updateSettings((curr) => ({
+              ...curr,
+              dataTicks: e.target.valueAsNumber,
+            }))
+          }
+        />
+        <p className={cn("text-sm text-muted-foreground")}>
+          Define the amount of how many latest timestamps should be displayed or
+          not.
+        </p>
+      </div>
+
+      <div className="grid w-full max-w-sm items-center gap-1.5">
         <Label htmlFor="chartViewMode">Chart View Mode</Label>
         <Tabs
           id="chartViewMode"
@@ -129,26 +150,6 @@ const SettingsForm = ({ onClose }: { onClose: () => void }) => {
             ))}
           </TabsList>
         </Tabs>
-      </div>
-
-      <div className="grid w-full max-w-sm items-center gap-1.5">
-        <Label htmlFor="dataTicks">Data Ticks</Label>
-        <Input
-          type="number"
-          id="dataTicks"
-          placeholder="Data Ticks"
-          value={settings.dataTicks}
-          onChange={(e) =>
-            updateSettings((curr) => ({
-              ...curr,
-              dataTicks: e.target.valueAsNumber,
-            }))
-          }
-        />
-        <p className={cn("text-sm text-muted-foreground")}>
-          Define the amount of how many latest timestamps should be displayed or
-          not.
-        </p>
       </div>
 
       <Label htmlFor="ignoreBoringDataMode">Ignore boring data mode</Label>

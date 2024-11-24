@@ -6,7 +6,6 @@ import { AlertCircleIcon } from "lucide-react";
 import { memo, useEffect } from "react";
 import { PlotlyChart } from "./charts/PlotlyChart";
 import { VegaLiteChart } from "./charts/VegaLiteChart";
-import { ClusterChartPreferencesPopover } from "./ClusterChartPreferencesPopover";
 import { clusterColors } from "./clusterColors";
 import {
   Tooltip,
@@ -23,30 +22,14 @@ export const MultiAggregatedLineChart = () => {
 
   const presentationSettings = useViewSettingsStore();
 
-  const { aggregated, colsAccordingToAggregation, processData } =
-    useViewModelStore();
-
-  // console.time("Rendering process duration");
-  // const { aggregated, colsAccordingToAggregation, yDomain } = aggregatorB(
-  //   values,
-  //   dimensions,
-  //   presentationSettings
-  // );
-  // console.timeEnd("Rendering process duration");
+  const { colsAccordingToAggregation, processData } = useViewModelStore();
 
   useEffect(() => {
     processData();
   }, [presentationSettings, values]);
 
   return (
-    <div className="container w-full my-2 flex flex-col flex-wrap gap-2">
-      <div className="flex flex-row justify-between gap-4 items-center">
-        <div className="text-muted-foreground">
-          Detected {aggregated.length} clusters.
-        </div>
-        <ClusterChartPreferencesPopover />
-        {/* <pre>{JSON.stringify(presentationSettings)}</pre> */}
-      </div>
+    <>
       <div className="flex flex-row flex-shrink items-center rounded-sm overflow-hidden">
         {colsAccordingToAggregation.map(([name, styleGroup], index) => (
           <TooltipProvider key={`${name}-${index}`}>
@@ -79,7 +62,7 @@ export const MultiAggregatedLineChart = () => {
           />
         ))} */}
       </div>
-    </div>
+    </>
   );
 };
 
