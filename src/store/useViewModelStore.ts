@@ -1,9 +1,9 @@
-import { create } from "zustand";
-import { useViewSettingsStore } from "./useViewSettingsStore";
-import { useRawDataStore } from "./useRawDataStore";
-import _ from "lodash";
 import { ClusteringWorker } from "@/lib/clustering.worker";
 import * as Comlink from "comlink";
+import _ from "lodash";
+import { create } from "zustand";
+import { useRawDataStore } from "./useRawDataStore";
+import { useViewSettingsStore } from "./useViewSettingsStore";
 
 import Worker from "../lib/clustering.worker?worker";
 
@@ -32,7 +32,7 @@ export const useViewModelStore = create<DataStore>((set) => {
       useViewSettingsStore.getState();
     console.log("Settings: ", presentationSettings);
 
-    const aggregated = await workerApi.aggregatorB(
+    const aggregated = await workerApi.aggregator(
       values,
       dimensions,
       presentationSettings

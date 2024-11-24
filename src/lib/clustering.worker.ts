@@ -3,7 +3,7 @@ import { aggregator } from "./clustering";
 
 // Define the functions that will be available in the worker
 const workerFunctions = {
-  aggregatorB: aggregator,
+  aggregator: aggregator,
 };
 
 export type ClusteringWorker = typeof workerFunctions;
