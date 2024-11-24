@@ -4,10 +4,11 @@ import { Link, Outlet } from "react-router-dom";
 export default function Root() {
   const routes = [
     { title: "Home", href: "" },
-    { title: "Anu Multi Line", href: "anu" },
-    { title: "2D Multi Line", href: "multi-line" },
-    { title: "2D Aggregated", href: "aggregated-line" },
-    { title: "2D Multi Aggregated", href: "multi-aggregated-line" },
+    { title: "3D", href: "anu" },
+    { title: "Multi Line", href: "multi-line" },
+    { title: "Aggregation", href: "aggregated-line" },
+    { title: "Multi Aggregation", href: "multi-aggregated-line" },
+    { title: "Cluster Aggregation", href: "aggregated-clusters" },
   ];
 
   return (
@@ -16,7 +17,7 @@ export default function Root() {
         <div className="container flex items-center flex-wrap ">
           <div className="text-white mr-6">
             <span className="font-semibold text-xl tracking-tight">
-              Time Series Viz
+              Time VIS
             </span>
           </div>
 

@@ -3,6 +3,7 @@ import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import ErrorPage from "./error-page";
 import "./index.css";
+import AggregatedClusters from "./routes/aggregated-clusters";
 import AggrLine from "./routes/aggregated-line";
 import Anu from "./routes/anu";
 import Home from "./routes/home";
@@ -32,6 +33,11 @@ const router = createBrowserRouter([
       {
         path: "multi-aggregated-line",
         element: <MutliAggregatedLine />,
+        errorElement: <ErrorPage />,
+      },
+      {
+        path: "aggregated-clusters",
+        element: <AggregatedClusters />,
         errorElement: <ErrorPage />,
       },
     ],

@@ -1,19 +1,19 @@
 import { cn } from "@/lib/utils";
 import { useRawDataStore } from "@/store/useRawDataStore";
-import { type ClassValue } from "clsx";
+import { useViewModelStore } from "@/store/useViewModelStore";
+import { useViewSettingsStore } from "@/store/useViewSettingsStore";
+import { AlertCircleIcon } from "lucide-react";
+import { memo, useEffect } from "react";
+import { PlotlyChart } from "./charts/PlotlyChart";
+import { VegaLiteChart } from "./charts/VegaLiteChart";
 import { ClusterChartPreferencesPopover } from "./ClusterChartPreferencesPopover";
+import { clusterColors } from "./clusterColors";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "./ui/tooltip";
-import { useViewSettingsStore } from "@/store/useViewSettingsStore";
-import { useViewModelStore } from "@/store/useViewModelStore";
-import { memo, useEffect } from "react";
-import { PlotlyChart } from "./charts/PlotlyChart";
-import { VegaLiteChart } from "./charts/VegaLiteChart";
-import { AlertCircleIcon } from "lucide-react";
 
 // TODO: Make this chart mostly recursive in a way that a user sees a subset whenever he selects one of those charts
 
@@ -54,7 +54,7 @@ export const MultiAggregatedLineChart = () => {
               <TooltipTrigger asChild>
                 <div
                   className={cn(
-                    colors[styleGroup % colors.length],
+                    clusterColors[styleGroup % clusterColors.length],
                     "flex-1 h-4",
                     index > 0 ? "border-l-[0.5px]" : ""
                   )}
@@ -83,21 +83,6 @@ export const MultiAggregatedLineChart = () => {
   );
 };
 
-const colors: ClassValue[] = [
-  "bg-red-200",
-  "bg-green-200",
-  "bg-blue-200",
-  "bg-purple-200",
-  "bg-emerald-200",
-  "bg-orange-200",
-  "bg-teal-200",
-  "bg-rose-200",
-  "bg-lime-200",
-  "bg-cyan-200",
-  "bg-pink-200",
-  "bg-amber-200",
-  "bg-sky-200",
-];
 const Charts = memo(() => {
   /**
    * This is a list of entries that again are a list of multiple values representing a multiline chart. So this data should be used to render multiple Muli-Line-Charts
@@ -128,7 +113,7 @@ const Charts = memo(() => {
             <PlotlyChart
               values={val}
               key={index}
-              className={colors[index % colors.length]}
+              className={clusterColors[index % clusterColors.length]}
               yDomain={yDomain}
               mode={mode}
               saveScreenSpace={saveScreenSpace}
@@ -150,7 +135,7 @@ const Charts = memo(() => {
           <PlotlyChart
             values={val}
             key={index}
-            className={colors[index % colors.length]}
+            className={clusterColors[index % clusterColors.length]}
             yDomain={yDomain}
             mode={mode}
             saveScreenSpace={saveScreenSpace}
@@ -166,7 +151,7 @@ const Charts = memo(() => {
         <VegaLiteChart
           values={val}
           key={index}
-          className={colors[index % colors.length]}
+          className={clusterColors[index % clusterColors.length]}
           yDomain={yDomain}
           mode={mode}
           saveScreenSpace={saveScreenSpace}
