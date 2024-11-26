@@ -58,7 +58,7 @@ const SettingsForm = ({ onClose }: { onClose: () => void }) => {
   const defaultValues = {
     mode: mode,
     rows: values.length,
-    columns: dimensions.length,
+    columns: dimensions.length + 1,
     streamingInterval: streamingInterval ?? 0,
   };
 

@@ -57,7 +57,7 @@ export const AggregatedClusterView = () => {
           {!!interestingTimestampIndizes.includes(groupIndex) && (
             <div
               className={cn(
-                "bg-gray-200 overflow-visible absolute",
+                "overflow-visible absolute",
                 "bottom-0",
                 "h-8 p-2 rounded-sm text-xs"
               )}

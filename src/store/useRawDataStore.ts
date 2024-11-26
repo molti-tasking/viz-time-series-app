@@ -108,7 +108,7 @@ const getRandomNextValue = (prev: number) => {
   return Math.random() > 0.5
     ? prev * (1 + Math.random() * Math.random() * 0.3)
     : prev *
-        (1 - Math.random() * Math.random() * Math.random() * Math.random());
+    (1 - Math.random() * Math.random() * Math.random() * Math.random());
 };
 
 const generateRandomTestData = (
@@ -124,9 +124,9 @@ const generateRandomTestData = (
       i > 0
         ? prev[i - 1].slice(1).map(getRandomNextValue)
         : Array.from(
-            { length: columnsCount - 1 },
-            () => Math.random() * (max - min) + min
-          );
+          { length: columnsCount },
+          () => Math.random() * (max - min) + min
+        );
     const row = [timestamp, ...randomValues];
     return [...prev, row];
   }, [] as number[][]);
@@ -169,7 +169,7 @@ const generateNextPeakTestData = (
 
     if (Math.random() < 0.05) {
       peakActive = true;
-      peakDuration = Math.floor(5 + Math.random() * 5);
+      peakDuration = Math.floor(2 + Math.random() * 5);
       randomValues = previousValues.map(
         (value) => value * (1 + Math.random() * Math.random() * 0.5)
       );
@@ -179,25 +179,52 @@ const generateNextPeakTestData = (
   return randomValues;
 };
 
+
+
+
+/**
+ * Generating initial values that all peak regularly. They have different "levels" in a way that their average values increase in bunches
+ */
 const generatePeakTestData = (
   columnsCount: number,
   rowsCount: number,
   min: number,
   max: number
-) => {
+): number[][] => {
+
   const startTime = Date.now();
+
+  const jumpStep = 5 // Jump step, how much the range jumps
+  const jumpInterval = 10 // Jump interval (every 10 values, range increases by jumpStep)
+
   peakActive = false;
   peakDecayCounter = 0;
   peakDuration = 0;
   baselineValues = [];
   return Array.from<number[][]>({ length: rowsCount }).reduce((prev, _, i) => {
     const timestamp = startTime + i * 1000 + (Math.random() - 0.5) * 200;
-    let randomValues: number[];
+    let randomValues: number[] = [];
     if (i === 0) {
-      randomValues = Array.from(
-        { length: columnsCount - 1 },
-        () => Math.random() * (max - min) + min
-      );
+
+      let currentMin = min;
+      let currentMax = max;
+
+      for (let i = 0; i < columnsCount; i++) {
+        // Generate a random value in the current range
+        const randomValue = Math.random() * (currentMax - currentMin) + currentMin;
+        randomValues.push(randomValue);
+
+        // Slightly increase the range for the next value
+        currentMin += 0.05; // Increment the minimum slightly
+        currentMax += 0.05; // Increment the maximum slightly
+
+        // Every jumpInterval values, make a larger jump
+        if ((i + 1) % jumpInterval === 0) {
+          currentMin += jumpStep
+          currentMax += jumpStep
+        }
+      }
+
       baselineValues = randomValues.slice();
     } else {
       randomValues = generateNextPeakTestData(prev[i - 1].slice(1));
