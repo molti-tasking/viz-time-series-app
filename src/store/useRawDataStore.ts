@@ -1,3 +1,5 @@
+import { loadHouseholdData } from "@/data/loadHouseholdData";
+import { loadStockData } from "@/data/loadStockData";
 import { create } from "zustand";
 
 interface DataStore {
@@ -6,6 +8,8 @@ interface DataStore {
   values: Record<string, number>[];
   streamingInterval: number | null;
   intervalId: NodeJS.Timeout | null;
+
+  loadDataset: (dataset: "household" | "stocks") => void;
 
   updateData: (
     mode: "random" | "peaks",
@@ -22,6 +26,36 @@ export const useRawDataStore = create<DataStore>((set, get) => {
     values: [],
     streamingInterval: null,
     intervalId: null,
+
+    loadDataset: (dataset: "household" | "stocks") => {
+      const { intervalId } = get();
+
+      if (intervalId) clearInterval(intervalId);
+
+      let dimensions: string[] = [];
+      let values: Record<string, number>[] = [];
+
+      if (dataset === "household") {
+        const houseHoldData = loadHouseholdData();
+        values = houseHoldData;
+        dimensions = Object.keys(houseHoldData[0]).filter(
+          (col) => col !== "timestamp"
+        );
+      } else if (dataset === "stocks") {
+        const stockData = loadStockData();
+        values = stockData;
+        dimensions = Object.keys(stockData[0]).filter(
+          (col) => col !== "timestamp"
+        );
+      }
+      set({
+        streamingInterval: null,
+        intervalId: null,
+
+        values,
+        dimensions,
+      });
+    },
 
     updateData: (mode, columnCount, rowCount, streamingInterval) => {
       const { intervalId } = get();
@@ -108,7 +142,7 @@ const getRandomNextValue = (prev: number) => {
   return Math.random() > 0.5
     ? prev * (1 + Math.random() * Math.random() * 0.3)
     : prev *
-    (1 - Math.random() * Math.random() * Math.random() * Math.random());
+        (1 - Math.random() * Math.random() * Math.random() * Math.random());
 };
 
 const generateRandomTestData = (
@@ -124,9 +158,9 @@ const generateRandomTestData = (
       i > 0
         ? prev[i - 1].slice(1).map(getRandomNextValue)
         : Array.from(
-          { length: columnsCount },
-          () => Math.random() * (max - min) + min
-        );
+            { length: columnsCount },
+            () => Math.random() * (max - min) + min
+          );
     const row = [timestamp, ...randomValues];
     return [...prev, row];
   }, [] as number[][]);
@@ -179,9 +213,6 @@ const generateNextPeakTestData = (
   return randomValues;
 };
 
-
-
-
 /**
  * Generating initial values that all peak regularly. They have different "levels" in a way that their average values increase in bunches
  */
@@ -191,11 +222,10 @@ const generatePeakTestData = (
   min: number,
   max: number
 ): number[][] => {
-
   const startTime = Date.now();
 
-  const jumpStep = 5 // Jump step, how much the range jumps
-  const jumpInterval = 10 // Jump interval (every 10 values, range increases by jumpStep)
+  const jumpStep = 5; // Jump step, how much the range jumps
+  const jumpInterval = 10; // Jump interval (every 10 values, range increases by jumpStep)
 
   peakActive = false;
   peakDecayCounter = 0;
@@ -205,13 +235,13 @@ const generatePeakTestData = (
     const timestamp = startTime + i * 1000 + (Math.random() - 0.5) * 200;
     let randomValues: number[] = [];
     if (i === 0) {
-
       let currentMin = min;
       let currentMax = max;
 
       for (let i = 0; i < columnsCount; i++) {
         // Generate a random value in the current range
-        const randomValue = Math.random() * (currentMax - currentMin) + currentMin;
+        const randomValue =
+          Math.random() * (currentMax - currentMin) + currentMin;
         randomValues.push(randomValue);
 
         // Slightly increase the range for the next value
@@ -220,8 +250,8 @@ const generatePeakTestData = (
 
         // Every jumpInterval values, make a larger jump
         if ((i + 1) % jumpInterval === 0) {
-          currentMin += jumpStep
-          currentMax += jumpStep
+          currentMin += jumpStep;
+          currentMax += jumpStep;
         }
       }
 

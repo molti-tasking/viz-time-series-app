@@ -4,6 +4,7 @@ import { useRawDataStore } from "@/store/useRawDataStore";
 export default function Home() {
   const values = useRawDataStore((state) => state.values);
   const updateData = useRawDataStore((state) => state.updateData);
+  const loadDataset = useRawDataStore((state) => state.loadDataset);
   const generateInitialData = () => {
     updateData("peaks", 12, 40);
   };
@@ -25,13 +26,17 @@ export default function Home() {
         There are several configurations for testing data that can be used
         through the nav bar. Use the button below to create some initial data.
       </p>
-      <Button
-        className="my-2"
-        onClick={generateInitialData}
-        disabled={!!values.length}
-      >
-        Create initial data
-      </Button>
+
+      <div className="flex flex-row gap-4 my-2">
+        <Button onClick={generateInitialData} disabled={!!values.length}>
+          Create initial data
+        </Button>
+
+        <Button onClick={() => loadDataset("household")}>
+          House hold data
+        </Button>
+        <Button onClick={() => loadDataset("stocks")}>Stock data</Button>
+      </div>
     </div>
   );
 }

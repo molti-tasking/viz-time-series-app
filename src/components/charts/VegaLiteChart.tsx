@@ -127,6 +127,7 @@ export const VegaLiteChart = ({
       x: {
         field: "timestamp",
         type: !!saveScreenSpace ? "ordinal" : "temporal",
+        axis: !!saveScreenSpace ? { labelExpr: "" } : undefined,
         title: "Time",
       },
       y: {

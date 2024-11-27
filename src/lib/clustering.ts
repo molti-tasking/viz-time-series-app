@@ -61,8 +61,17 @@ export const aggregator = (
     )
   );
 
-  const yMin = Math.min(...allValues);
-  const yMax = Math.max(...allValues);
+  // Find max values of all to define the sizes of the charts
+  let yMin: number = +Infinity;
+  let yMax: number = -Infinity;
+  for (const value of allValues) {
+    if (value < yMin) {
+      yMin = value;
+    } else if (value > yMax) {
+      yMax = value;
+    }
+  }
+
   const yDomain: [number, number] = [yMin, yMax];
 
   return { aggregated, yDomain, colsAccordingToAggregation };
