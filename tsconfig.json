@@ -22,7 +22,7 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src", "util/loadStockData.ts"],
+  "include": ["src", "util/fetchStockData.ts"],
   "references": [
     {
       "path": "./tsconfig.node.json"
