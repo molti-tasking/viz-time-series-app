@@ -9,14 +9,12 @@ export type ViewSettingsStore = ChartPresentationSettings & {
 };
 
 export const useViewSettingsStore = create<ViewSettingsStore>((set, get) => {
-  const dataTicks = Math.min(useRawDataStore.getState().values.length ?? 50);
+  const dataTicks = Math.min(useRawDataStore.getState().values.length, 50);
   return {
     eps: 8,
     dataTicks,
     mode: "multiline",
-    ignoreBoringDataMode: "standard",
-    meanRange: 0.1,
-    tickRange: 8,
+    ignoreBoringDataMode: "off",
 
     updateSettings: (newSettings) => {
       const newValues = newSettings(get());
