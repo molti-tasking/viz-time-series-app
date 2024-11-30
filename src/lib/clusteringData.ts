@@ -7,6 +7,11 @@ export const clusteringData = (
   dimensions: string[],
   settings: ChartPresentationSettings
 ) => {
+  if (dataToBeClustered.length !== settings.dataTicks) {
+    console.warn(
+      "The length of the data to be clustered does not match the specified data ticks amount."
+    );
+  }
   // ----------------
   // Clustering data
   // ----------------
