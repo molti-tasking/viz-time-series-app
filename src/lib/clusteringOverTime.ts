@@ -38,15 +38,20 @@ export const clusteringOverTime = (
     dataEntryIndex < rawData.length;
     dataEntryIndex++
   ) {
-    if (dataEntryIndex < clusteringContextWindow) {
-      // Skip all values below the context window size.
-      continue;
-    }
+    /**
+     * We use a "slice", which excludes the last item of the list. So we have to add 1 the the end index as we only iterate within the list.
+     */
+    const endIndex = dataEntryIndex + 1;
     /**
      * This is the first value that should be taken into consideration for clustering.
      */
-    const startIndex = dataEntryIndex - clusteringContextWindow;
-    const dataToBeClustered = rawData.slice(startIndex, dataEntryIndex);
+    const startIndex = endIndex - clusteringContextWindow;
+    if (startIndex < 0) {
+      // Skip all values below the context window size.
+      continue;
+    }
+
+    const dataToBeClustered = rawData.slice(startIndex, endIndex);
 
     const timestamp =
       "timestamp" in rawData[dataEntryIndex]

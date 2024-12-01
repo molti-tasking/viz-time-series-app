@@ -1,7 +1,7 @@
-import Plot from "react-plotly.js";
-import { Layout } from "plotly.js";
-import { ChartProps } from "./ChartProps";
 import { cn } from "@/lib/utils";
+import { Layout } from "plotly.js";
+import Plot from "react-plotly.js";
+import { ChartProps } from "./ChartProps";
 
 export const PlotlyChart = ({ values, yDomain, className }: ChartProps) => {
   const dimensions = values.length
@@ -39,8 +39,8 @@ export const PlotlyChart = ({ values, yDomain, className }: ChartProps) => {
       className={cn(className)}
       config={{
         displaylogo: false,
-        scrollZoom: false,
-        staticPlot: true,
+        // scrollZoom: false,
+        // staticPlot: true,
         displayModeBar: false,
       }}
     />
