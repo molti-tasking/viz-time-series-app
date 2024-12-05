@@ -37,7 +37,7 @@ export type ChartPresentationSettings = (
     /**
      * Right now it may not make so much sense to mix a visual presentation with a technology. But we do not want to overcomplicate it right now.
      */
-    mode: "clusters" | "multiline" | "envelope" | "plotly";
+    mode: "clusters" | "multiline" | "envelope" | "plotly" | "highlighted";
 
     dataTicks?: number;
     timeScale?: { from: number; to: number };

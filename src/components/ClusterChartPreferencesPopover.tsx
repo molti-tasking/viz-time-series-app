@@ -34,6 +34,7 @@ export function ClusterChartPreferencesPopover() {
 const chartViewOptions: Record<ChartPresentationSettings["mode"], string> = {
   multiline: "Multiline",
   envelope: "Envelope",
+  highlighted: "Highlighted (NEW)",
   plotly: "Plotly (GL)",
   clusters: "Clusters (NEW)",
 };

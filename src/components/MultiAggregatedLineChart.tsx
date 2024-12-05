@@ -5,6 +5,7 @@ import { AlertCircleIcon } from "lucide-react";
 import { memo, useEffect } from "react";
 import { PlotlyChart } from "./charts/PlotlyChart";
 import { VegaLiteChart } from "./charts/VegaLiteChart";
+import { VegaLiteHighlightedChart } from "./charts/VegaLiteHighlightedChart";
 import { clusterColors } from "./clusterColors";
 import { ClusterLegend } from "./ClusterLegend";
 
@@ -93,6 +94,21 @@ const Charts = memo(() => {
       <>
         {aggregated.map((val, index) => (
           <PlotlyChart
+            values={val}
+            key={index}
+            className={clusterColors[index % clusterColors.length]}
+            yDomain={yDomain}
+            mode={mode}
+            saveScreenSpace={saveScreenSpace}
+          />
+        ))}
+      </>
+    );
+  } else if (mode === "highlighted") {
+    return (
+      <>
+        {aggregated.map((val, index) => (
+          <VegaLiteHighlightedChart
             values={val}
             key={index}
             className={clusterColors[index % clusterColors.length]}
