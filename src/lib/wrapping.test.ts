@@ -823,7 +823,7 @@ test("Test wrapping on a one dimensional array with a range of 5 data points", (
 //         { timestamp: 1730748261816, "Col 8": 13.193867562214644 },
 //       ],
 //     ],
-//     colsAccordingToAggregation: [
+//     clusterAssignment: [
 //       ["Col 1", 0],
 //       ["Col 2", 1],
 //       ["Col 3", 2],
@@ -1574,7 +1574,7 @@ test("Test wrapping on a one dimensional array with a range of 5 data points", (
 //         { timestamp: 1730748261816, "Col 8": 13.193867562214644 },
 //       ],
 //     ],
-//     colsAccordingToAggregation: [
+//     clusterAssignment: [
 //       ["Col 1", 0],
 //       ["Col 2", 1],
 //       ["Col 3", 2],

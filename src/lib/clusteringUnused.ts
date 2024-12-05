@@ -3,7 +3,7 @@ import { ChartPresentationSettings } from "./ChartPresentationSettings";
 type AggregatedProps = {
   aggregated: Record<string, number>[][];
   yDomain: [number, number];
-  colsAccordingToAggregation: [string, number][];
+  clusterAssignment: [string, number][];
 };
 
 /**
@@ -86,12 +86,10 @@ export const aggregatorUnused = (
     // 3. Set those data points to undefined
   }
 
-  const colsAccordingToAggregation: [string, number][] = dimensions.map(
-    (val) => [
-      val,
-      aggregated.findIndex((entries) => Object.keys(entries[0]).includes(val)),
-    ]
-  );
+  const clusterAssignment: [string, number][] = dimensions.map((val) => [
+    val,
+    aggregated.findIndex((entries) => Object.keys(entries[0]).includes(val)),
+  ]);
 
   // Calculate the shared y-axis domain across all clusters
   const allValues = dataToBeClustered.flatMap((entries) =>
@@ -103,7 +101,7 @@ export const aggregatorUnused = (
   const yMax = Math.max(...allValues);
   const yDomain: [number, number] = [yMin, yMax];
 
-  return { aggregated, yDomain, colsAccordingToAggregation };
+  return { aggregated, yDomain, clusterAssignment };
 };
 
 /**

@@ -822,7 +822,7 @@ test("Test the DBSCAN", () => {
         { timestamp: 1730748261816, "Col 8": 13.193867562214644 },
       ],
     ],
-    colsAccordingToAggregation: [
+    clusterAssignment: [
       ["Col 1", 0],
       ["Col 2", 1],
       ["Col 3", 2],
@@ -1578,7 +1578,7 @@ test("Test the DBSCAN with second impl", () => {
         { timestamp: 1730748261816, "Col 8": 13.193867562214644 },
       ],
     ],
-    colsAccordingToAggregation: [
+    clusterAssignment: [
       ["Col 1", 0],
       ["Col 2", 1],
       ["Col 3", 2],

@@ -1,4 +1,3 @@
-import { cn } from "@/lib/utils";
 import { useRawDataStore } from "@/store/useRawDataStore";
 import { useViewModelStore } from "@/store/useViewModelStore";
 import { useViewSettingsStore } from "@/store/useViewSettingsStore";
@@ -7,12 +6,7 @@ import { memo, useEffect } from "react";
 import { PlotlyChart } from "./charts/PlotlyChart";
 import { VegaLiteChart } from "./charts/VegaLiteChart";
 import { clusterColors } from "./clusterColors";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "./ui/tooltip";
+import { ClusterLegend } from "./ClusterLegend";
 
 // TODO: Make this chart mostly recursive in a way that a user sees a subset whenever he selects one of those charts
 
@@ -22,7 +16,7 @@ export const MultiAggregatedLineChart = () => {
 
   const presentationSettings = useViewSettingsStore();
 
-  const { colsAccordingToAggregation, processData } = useViewModelStore();
+  const processData = useViewModelStore((state) => state.processData);
 
   useEffect(() => {
     processData();
@@ -30,8 +24,9 @@ export const MultiAggregatedLineChart = () => {
 
   return (
     <>
-      <div className="flex flex-row flex-shrink items-center rounded-sm overflow-hidden">
-        {colsAccordingToAggregation.map(([name, styleGroup], index) => (
+      <ClusterLegend />
+      {/* <div className="flex flex-row flex-shrink items-center rounded-sm overflow-hidden">
+        {clusterAssignment.map(([name, styleGroup], index) => (
           <TooltipProvider key={`${name}-${index}`}>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -47,7 +42,7 @@ export const MultiAggregatedLineChart = () => {
             </Tooltip>
           </TooltipProvider>
         ))}
-      </div>
+      </div> */}
 
       <div className="flex-1 flex flex-col gap-2 overflow-scroll">
         <Charts />

@@ -11,7 +11,11 @@ import Worker from "../lib/clustering.worker?worker";
 interface DataStore {
   aggregated: Record<string, number>[][];
   yDomain: [number, number];
-  colsAccordingToAggregation: [string, number][];
+  clusterAssignment: [string, number][];
+  clusterAssignmentHistory: {
+    timestamp: number;
+    entries: [string, number][];
+  }[];
 
   /**
    * This data is needed only for certain views. It should only be calculated when needed.
@@ -25,7 +29,7 @@ interface DataStore {
 const workerInstance = new Worker({ name: "aggregator" });
 const workerApi = Comlink.wrap<ClusteringWorker>(workerInstance);
 
-export const useViewModelStore = create<DataStore>((set) => {
+export const useViewModelStore = create<DataStore>((set, get) => {
   console.log("init view model store");
 
   const throttledDataProcess = _.throttle(async () => {
@@ -46,8 +50,19 @@ export const useViewModelStore = create<DataStore>((set) => {
     console.timeEnd(
       "ViewModel basic data process duration " + String(timerName)
     );
+    const lastTimestamp = values[values.length - 1]["timestamp"] ?? Date.now();
+    const entries = get().clusterAssignment;
+    const clusterAssignmentHistory = get().clusterAssignmentHistory;
+    const updatedClusterAssignmentHistory = clusterAssignmentHistory.toSpliced(
+      0,
+      0,
+      { timestamp: lastTimestamp, entries }
+    );
 
-    set(aggregated);
+    set({
+      ...aggregated,
+      clusterAssignmentHistory: updatedClusterAssignmentHistory,
+    });
   }, 2000);
 
   const throttledClustersInTimeProcess = _.throttle(async () => {
@@ -78,7 +93,8 @@ export const useViewModelStore = create<DataStore>((set) => {
   return {
     aggregated: [],
     yDomain: [0, 10],
-    colsAccordingToAggregation: [],
+    clusterAssignment: [],
+    clusterAssignmentHistory: [],
     clustersInTime: [],
 
     processData: throttledDataProcess,
