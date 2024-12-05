@@ -16,6 +16,10 @@ interface DataStore {
     timestamp: number;
     entries: [string, number][];
   }[];
+  highlightInfo: {
+    dimension: string;
+    opacity: number;
+  }[][];
 
   /**
    * This data is needed only for certain views. It should only be calculated when needed.
@@ -51,17 +55,31 @@ export const useViewModelStore = create<DataStore>((set, get) => {
       "ViewModel basic data process duration " + String(timerName)
     );
     const lastTimestamp = values[values.length - 1]["timestamp"] ?? Date.now();
-    const entries = get().clusterAssignment;
+    const clusterAssignment = aggregated.clusterAssignment;
     const clusterAssignmentHistory = get().clusterAssignmentHistory;
-    const updatedClusterAssignmentHistory = clusterAssignmentHistory.toSpliced(
-      0,
-      0,
-      { timestamp: lastTimestamp, entries }
-    );
+    const updatedClusterAssignmentHistory = clusterAssignmentHistory
+      .toSpliced(0, 0, { timestamp: lastTimestamp, entries: clusterAssignment })
+      .slice(0, 20);
+
+    let highlightInfo: {
+      dimension: string;
+      opacity: number;
+    }[][] = [];
+    if (presentationSettings.mode === "highlighted") {
+      highlightInfo = await workerApi.highlighter(
+        aggregated.aggregated,
+        clusterAssignment,
+        updatedClusterAssignmentHistory.slice(
+          0,
+          presentationSettings.clusterAssignmentHistoryDepth
+        )
+      );
+    }
 
     set({
       ...aggregated,
       clusterAssignmentHistory: updatedClusterAssignmentHistory,
+      highlightInfo,
     });
   }, 2000);
 
@@ -96,6 +114,7 @@ export const useViewModelStore = create<DataStore>((set, get) => {
     clusterAssignment: [],
     clusterAssignmentHistory: [],
     clustersInTime: [],
+    highlightInfo: [],
 
     processData: throttledDataProcess,
     processClustersInTimeData: throttledClustersInTimeProcess,

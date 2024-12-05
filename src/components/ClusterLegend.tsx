@@ -22,7 +22,7 @@ export const ClusterLegend = () => {
 
   return (
     <div className="flex flex-col w-full gap-1">
-      <div className="flex flex-col-reverse w-full gap-0.5">
+      <div className="flex flex-col-reverse w-full">
         {clusterAssignmentHistory.map(({ timestamp, entries }, index) => {
           const opacity = (
             (clusterAssignmentHistory.length - index) /
@@ -47,7 +47,7 @@ export const ClusterLegend = () => {
 
 const LegendBar = ({ entries }: { entries: [string, number][] }) => {
   return (
-    <div className="flex flex-row flex-shrink items-center rounded-sm overflow-hidden">
+    <div className="flex flex-row flex-shrink items-center  overflow-hidden">
       {entries.map(([name, styleGroup], index) => (
         <TooltipProvider key={`${name}-${index}`}>
           <Tooltip>

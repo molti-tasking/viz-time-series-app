@@ -1,6 +1,4 @@
 import { cn } from "@/lib/utils";
-import { useViewModelStore } from "@/store/useViewModelStore";
-import { useViewSettingsStore } from "@/store/useViewSettingsStore";
 import { VegaLite, type VisualizationSpec } from "react-vega";
 import { ChartProps } from "./ChartProps";
 
@@ -9,60 +7,13 @@ export const VegaLiteHighlightedChart = ({
   className,
   yDomain,
   saveScreenSpace,
-}: ChartProps) => {
-  const clusterAssignment = useViewModelStore(
-    (state) => state.clusterAssignment
-  );
-  const clusterAssignmentHistoryDepth = useViewSettingsStore(
-    (state) => state.clusterAssignmentHistoryDepth
-  );
-  const clusterAssignmentHistory = useViewModelStore(
-    (state) => state.clusterAssignmentHistory
-  ).slice(0, clusterAssignmentHistoryDepth);
-
-  const dimensions = values.length
+  highlightInfo,
+}: ChartProps & {
+  highlightInfo?: { dimension: string; opacity: number }[];
+}) => {
+  const dimensions: string[] = values.length
     ? Object.keys(values[0]).filter((e) => e !== "timestamp")
     : [];
-
-  // Now we want to find out, which columns of the current cluster changed in the past.
-  // We want to find out a certain opacity indicating the "difference" of that value.
-  // We can do it by checking each time series and compare it like this:
-  // 1. Get current cluster.
-  // 2. Check for how many of the past clusters it had a different cluster.
-  // 3. The more different clusters it has, the higher the opacity.
-
-  const timeSeriesToBeHighlighted: { dimension: string; opacity: number }[] =
-    [];
-
-  for (let dimIndex = 0; dimIndex < dimensions.length; dimIndex++) {
-    const dimension = dimensions[dimIndex];
-    const currentCluster = clusterAssignment.find(
-      ([currDim]) => dimension === currDim
-    )?.[1];
-
-    let differentClustersInPast = 0;
-
-    for (
-      let clusterIndex = 0;
-      clusterIndex < clusterAssignmentHistory.length;
-      clusterIndex++
-    ) {
-      const pastClusterAssignment = clusterAssignmentHistory[clusterIndex];
-      const pastCluster = pastClusterAssignment.entries.find(
-        ([currDim]) => dimension === currDim
-      )?.[1];
-
-      const isSameCluster = currentCluster === pastCluster;
-      if (!isSameCluster) {
-        differentClustersInPast = differentClustersInPast + 1;
-      }
-    }
-
-    if (differentClustersInPast > 0) {
-      const opacity = differentClustersInPast / clusterAssignmentHistory.length;
-      timeSeriesToBeHighlighted.push({ dimension, opacity });
-    }
-  }
 
   const spec: VisualizationSpec = {
     $schema: "https://vega.github.io/schema/vega-lite/v5.json",
@@ -91,12 +42,10 @@ export const VegaLiteHighlightedChart = ({
     layer: [
       {
         transform: [
-          ...(!!timeSeriesToBeHighlighted.length
+          ...(!!highlightInfo?.length
             ? [
                 {
-                  fold: timeSeriesToBeHighlighted.map(
-                    ({ dimension }) => dimension
-                  ),
+                  fold: highlightInfo?.map(({ dimension }) => dimension),
                   as: ["variable", "column"] as [string, string],
                 },
               ]
@@ -110,12 +59,10 @@ export const VegaLiteHighlightedChart = ({
           y: { field: "column", type: "quantitative", title: "Value" },
           color: { field: "variable", type: "ordinal" },
           opacity: {
-            condition: timeSeriesToBeHighlighted.map(
-              ({ dimension, opacity }) => ({
-                test: `datum.variable === '${dimension}'`,
-                value: opacity,
-              })
-            ),
+            condition: highlightInfo?.map(({ dimension, opacity }) => ({
+              test: `datum.variable === '${dimension}'`,
+              value: dimensions.length < 3 ? 1.0 : opacity,
+            })),
             value: 0.3,
           },
         },

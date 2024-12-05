@@ -51,6 +51,7 @@ const Charts = memo(() => {
    * It can be more than 30 charts that are getting updated every second.
    */
   const aggregated = useViewModelStore((state) => state.aggregated);
+  const highlightInfo = useViewModelStore((state) => state.highlightInfo);
   const yDomain = useViewModelStore((state) => state.yDomain);
 
   const mode = useViewSettingsStore((state) => state.mode);
@@ -115,6 +116,7 @@ const Charts = memo(() => {
             yDomain={yDomain}
             mode={mode}
             saveScreenSpace={saveScreenSpace}
+            highlightInfo={highlightInfo?.[index]}
           />
         ))}
       </>
