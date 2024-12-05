@@ -1,5 +1,6 @@
 import { cn } from "@/lib/utils";
 import { useViewModelStore } from "@/store/useViewModelStore";
+import { useViewSettingsStore } from "@/store/useViewSettingsStore";
 import { clusterColors } from "./clusterColors";
 import {
   Tooltip,
@@ -12,9 +13,12 @@ export const ClusterLegend = () => {
   const clusterAssignment = useViewModelStore(
     (state) => state.clusterAssignment
   );
+  const clusterAssignmentHistoryDepth = useViewSettingsStore(
+    (state) => state.clusterAssignmentHistoryDepth
+  );
   const clusterAssignmentHistory = useViewModelStore(
     (state) => state.clusterAssignmentHistory
-  ).slice(0, 3);
+  ).slice(0, clusterAssignmentHistoryDepth);
 
   return (
     <div className="flex flex-col w-full gap-1">

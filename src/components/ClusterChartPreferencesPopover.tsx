@@ -109,25 +109,48 @@ const SettingsForm = ({ onClose }: { onClose: () => void }) => {
           </p>
         </div>
       </div>
+      <div className="grid w-full grid-cols-2 gap-2 items-start">
+        <div className="grid w-full max-w-sm items-center gap-1.5">
+          <Label htmlFor="dataTicks">Data Ticks</Label>
+          <Input
+            type="number"
+            id="dataTicks"
+            placeholder="Data Ticks"
+            value={settings.dataTicks}
+            onChange={(e) =>
+              updateSettings((curr) => ({
+                ...curr,
+                dataTicks: e.target.valueAsNumber,
+              }))
+            }
+          />
+          <p className={cn("text-sm text-muted-foreground")}>
+            Define the amount of how many latest timestamps should be displayed
+            or not.
+          </p>
+        </div>
 
-      <div className="grid w-full max-w-sm items-center gap-1.5">
-        <Label htmlFor="dataTicks">Data Ticks</Label>
-        <Input
-          type="number"
-          id="dataTicks"
-          placeholder="Data Ticks"
-          value={settings.dataTicks}
-          onChange={(e) =>
-            updateSettings((curr) => ({
-              ...curr,
-              dataTicks: e.target.valueAsNumber,
-            }))
-          }
-        />
-        <p className={cn("text-sm text-muted-foreground")}>
-          Define the amount of how many latest timestamps should be displayed or
-          not.
-        </p>
+        <div className="grid w-full max-w-sm items-center gap-1.5">
+          <Label htmlFor="clusterAssignmentHistoryDepth">
+            Cluster Assignment History Depth
+          </Label>
+          <Input
+            type="number"
+            id="clusterAssignmentHistoryDepth"
+            placeholder="Cluster Assignment History Depth"
+            value={settings.clusterAssignmentHistoryDepth}
+            onChange={(e) =>
+              updateSettings((curr) => ({
+                ...curr,
+                clusterAssignmentHistoryDepth: e.target.valueAsNumber,
+              }))
+            }
+          />
+          <p className={cn("text-sm text-muted-foreground")}>
+            Define the amount of how many cluster assignment history layers
+            should be displayed.
+          </p>
+        </div>
       </div>
 
       <div className="grid w-full max-w-sm items-center gap-1.5">

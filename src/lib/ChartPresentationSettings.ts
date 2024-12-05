@@ -30,6 +30,11 @@ export type ChartPresentationSettings = (
       }
   ) & {
     /**
+     * The amount of cluster assignment history depth. Only applicable for chart view to decide how many stages should be displayed
+     */
+    clusterAssignmentHistoryDepth?: number;
+
+    /**
      * Right now it may not make so much sense to mix a visual presentation with a technology. But we do not want to overcomplicate it right now.
      */
     mode: "clusters" | "multiline" | "envelope" | "plotly";
