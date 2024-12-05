@@ -25,24 +25,6 @@ export const MultiAggregatedLineChart = () => {
   return (
     <>
       <ClusterLegend />
-      {/* <div className="flex flex-row flex-shrink items-center rounded-sm overflow-hidden">
-        {clusterAssignment.map(([name, styleGroup], index) => (
-          <TooltipProvider key={`${name}-${index}`}>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div
-                  className={cn(
-                    clusterColors[styleGroup % clusterColors.length],
-                    "flex-1 h-4",
-                    index > 0 ? "border-l-[0.5px]" : ""
-                  )}
-                ></div>
-              </TooltipTrigger>
-              <TooltipContent>{name}</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        ))}
-      </div> */}
 
       <div className="flex-1 flex flex-col gap-2 overflow-scroll">
         <Charts />
