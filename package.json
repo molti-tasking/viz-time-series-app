@@ -41,6 +41,7 @@
     "react-plotly.js": "^2.6.0",
     "react-router-dom": "^6.27.0",
     "react-vega": "^7.6.0",
+    "rust_wasm_module": "file:backend/rust_wasm_module/pkg",
     "tailwind-merge": "^2.5.3",
     "tailwindcss-animate": "^1.0.7",
     "vega": "^5.30.0",
