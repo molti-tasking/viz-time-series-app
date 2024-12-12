@@ -1,4 +1,5 @@
 import { DataSettingsPopover } from "@/components/DataSettingsPopover";
+import { StarsIcon } from "lucide-react";
 import { Link, Outlet } from "react-router-dom";
 
 export default function Root() {
@@ -13,14 +14,15 @@ export default function Root() {
   return (
     <div className="flex flex-col min-h-screen">
       <nav className="bg-primary text-primary-foreground py-2">
-        <div className="container flex items-center flex-wrap ">
-          <div className="text-white mr-6">
+        <div className="container flex items-center flex-wrap justify-between gap-x-6 gap-y-2">
+          <div className="text-white flex items-center gap-4">
             <span className="font-semibold text-xl tracking-tight">
               Time VIS
             </span>
+            <StarsIcon />
           </div>
 
-          <div className="flex flex-row gap-4 mx-8 ">
+          <div className="flex flex-row gap-4">
             {routes.map((r) => (
               <Link
                 className="text-sm hover:underline"

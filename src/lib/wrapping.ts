@@ -5,13 +5,8 @@ export const dataWrappingProcess = (
   aggregated: Record<string, number>[][],
   settings: ChartPresentationSettings
 ) => {
-  if (
-    settings.ignoreBoringDataMode === "standard" &&
-    "meanRange" in settings &&
-    !!settings.meanRange &&
-    "tickRange" in settings &&
-    !!settings.tickRange
-  ) {
+  const { meanRange, tickRange, ignoreBoringDataMode } = settings;
+  if (ignoreBoringDataMode === "standard" && !!meanRange && !!tickRange) {
     // Map all cluster dimensions because we need them later in order to set the values to undefined if needed.
     const clustersDimensions: string[][] = [];
     for (
@@ -28,11 +23,10 @@ export const dataWrappingProcess = (
 
     // 1. Get unimportant data areas for each cluster
     const allBoringValues = aggregated.map((aggregatedValues, index) =>
-      findBoringTimestamps(
-        aggregatedValues,
-        clustersDimensions[index],
-        settings
-      )
+      findBoringTimestamps(aggregatedValues, clustersDimensions[index], {
+        meanRange,
+        tickRange,
+      })
     );
     // 2. Get the unimportant data areas that all clusters have in common
     const commonBoringData = findCommonElements(allBoringValues).sort();

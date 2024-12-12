@@ -14,7 +14,7 @@ export const useViewSettingsStore = create<ViewSettingsStore>((set, get) => {
     eps: 8,
     dataTicks,
     clusterAssignmentHistoryDepth: 5,
-    mode: "multiline",
+    mode: "highlighted",
     ignoreBoringDataMode: "off",
 
     updateSettings: (newSettings) => {
