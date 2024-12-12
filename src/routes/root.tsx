@@ -12,7 +12,7 @@ export default function Root() {
   ];
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col h-screen">
       <nav className="bg-primary text-primary-foreground py-2">
         <div className="container flex items-center flex-wrap justify-between gap-x-6 gap-y-2">
           <div className="text-white flex items-center gap-4">
@@ -37,7 +37,7 @@ export default function Root() {
           <DataSettingsPopover />
         </div>
       </nav>
-      <div className="h-full w-full flex flex-1">
+      <div className="w-full flex flex-1" style={{ overflow: "overlay" }}>
         <Outlet />
       </div>
     </div>

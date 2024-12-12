@@ -9,7 +9,7 @@ export default function MutliAggregatedLine() {
   const aggregated = useViewModelStore((data) => data.aggregated);
 
   return (
-    <div className="container w-full my-2 flex flex-col flex-wrap gap-2">
+    <div className="container w-full py-2 flex flex-col flex-wrap gap-2 h-full">
       <div className="flex flex-row justify-between gap-4 items-center">
         <div className="text-muted-foreground">
           Detected {aggregated.length} clusters.

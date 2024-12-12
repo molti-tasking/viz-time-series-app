@@ -1,13 +1,15 @@
+import { cn } from "@/lib/utils";
 import { useRawDataStore } from "@/store/useRawDataStore";
 import { useViewModelStore } from "@/store/useViewModelStore";
 import { useViewSettingsStore } from "@/store/useViewSettingsStore";
 import { AlertCircleIcon } from "lucide-react";
-import { memo, useEffect } from "react";
+import { memo, useEffect, useRef } from "react";
 import { PlotlyChart } from "./charts/PlotlyChart";
 import { VegaLiteChart } from "./charts/VegaLiteChart";
 import { VegaLiteHighlightedChart } from "./charts/VegaLiteHighlightedChart";
 import { clusterColors } from "./clusterColors";
 import { ClusterLegend } from "./ClusterLegend";
+import { useContainerDimensions } from "./useContainerDimensions";
 
 // TODO: Make this chart mostly recursive in a way that a user sees a subset whenever he selects one of those charts
 
@@ -26,21 +28,30 @@ export const MultiAggregatedLineChart = () => {
   return (
     <>
       <ClusterLegend />
-
-      <div className="flex-1 flex flex-col gap-2 overflow-scroll">
-        <Charts />
-        {/* <PlotlyChart /> */}
-        {/* {aggregated.map((val, index) => (
-          <AggregatedLineChart
-            values={val}
-            key={index}
-            className={colors[index % colors.length]}
-            yDomain={yDomain}
-            presentationSettings={presentationSettings}
-          />
-        ))} */}
-      </div>
+      <ChartGrid />
     </>
+  );
+};
+
+const ChartGrid = () => {
+  const ref = useRef<HTMLDivElement>(null);
+  const { height, width } = useContainerDimensions(ref);
+
+  const aggregated = useViewModelStore((state) => state.aggregated);
+  const amountOfCharts = aggregated.length;
+
+  const gridCols = Math.floor(Math.sqrt(amountOfCharts));
+
+  // Now we need to calculate best amount of columns that we want to have...
+  console.log({ height, width });
+  return (
+    <div
+      ref={ref}
+      className={cn("flex-1 grid gap-2 overflow-scroll")}
+      style={{ gridTemplateColumns: `repeat(${gridCols}, minmax(0, 1fr))` }}
+    >
+      <Charts />
+    </div>
   );
 };
 
