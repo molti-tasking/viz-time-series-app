@@ -19,6 +19,7 @@ interface DataStore {
   highlightInfo: {
     dimension: string;
     opacity: number;
+    lastDimension: number | undefined;
   }[][];
 
   /**
@@ -55,7 +56,8 @@ export const useViewModelStore = create<DataStore>((set, get) => {
       "ViewModel basic data process duration " + String(timerName)
     );
     const lastTimestamp = values[values.length - 1]["timestamp"] ?? Date.now();
-    const clusterAssignment = aggregated.clusterAssignment;
+    const clusterAssignment: [string, number][] = aggregated.clusterAssignment;
+
     const clusterAssignmentHistory = get().clusterAssignmentHistory;
     const updatedClusterAssignmentHistory = clusterAssignmentHistory
       .toSpliced(0, 0, { timestamp: lastTimestamp, entries: clusterAssignment })
@@ -64,6 +66,7 @@ export const useViewModelStore = create<DataStore>((set, get) => {
     let highlightInfo: {
       dimension: string;
       opacity: number;
+      lastDimension: number | undefined;
     }[][] = [];
     if (presentationSettings.mode === "highlighted") {
       highlightInfo = await workerApi.highlighter(

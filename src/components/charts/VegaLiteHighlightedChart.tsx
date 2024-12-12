@@ -1,15 +1,21 @@
 import { cn } from "@/lib/utils";
 import { VegaLite, type VisualizationSpec } from "react-vega";
+import { clusterColors } from "../clusterColors";
 import { ChartProps } from "./ChartProps";
 
 export const VegaLiteHighlightedChart = ({
   values,
-  className,
+  chartColor,
   yDomain,
   saveScreenSpace,
   highlightInfo,
 }: ChartProps & {
-  highlightInfo?: { dimension: string; opacity: number }[];
+  highlightInfo?: {
+    dimension: string;
+    opacity: number;
+    lastDimension: number | undefined;
+  }[];
+  chartColor: string;
 }) => {
   const dimensions: string[] = values.length
     ? Object.keys(values[0]).filter((e) => e !== "timestamp")
@@ -29,14 +35,13 @@ export const VegaLiteHighlightedChart = ({
         field: "timestamp",
         type: !!saveScreenSpace ? "ordinal" : "temporal",
         axis: !!saveScreenSpace ? { labelExpr: "" } : undefined,
-        title: "Time",
       },
       y: {
         field: "value",
         type: "quantitative",
-        title: "Value",
         scale: { domain: yDomain },
       },
+      color: { legend: null },
     },
 
     layer: [
@@ -55,9 +60,25 @@ export const VegaLiteHighlightedChart = ({
         ],
         mark: { type: "line" },
         encoding: {
-          x: { field: "timestamp", type: "temporal", title: "Time" },
-          y: { field: "column", type: "quantitative", title: "Value" },
-          color: { field: "variable", type: "ordinal" },
+          x: { field: "timestamp", type: "temporal" },
+          y: { field: "column", type: "quantitative" },
+
+          color: {
+            field: "variable",
+            type: "ordinal",
+            condition: highlightInfo?.map(({ dimension, lastDimension }) => {
+              // We want to render the highlighted line in the color of the previous chart
+              const clusterColor =
+                lastDimension !== undefined
+                  ? clusterColors[lastDimension % clusterColors.length]
+                  : "gray";
+              return {
+                test: `datum.variable === '${dimension}'`,
+                value: clusterColor, // Use the color property from highlightInfo
+              };
+            }),
+          },
+
           opacity: {
             condition: highlightInfo?.map(({ dimension, opacity }) => ({
               test: `datum.variable === '${dimension}'`,
@@ -68,10 +89,36 @@ export const VegaLiteHighlightedChart = ({
         },
       },
       {
-        mark: { type: "area", color: "steelblue", opacity: 0.3 },
+        mark: { type: "area", color: chartColor, opacity: 0.3 },
         encoding: {
-          x: { field: "timestamp", type: "temporal", title: "Time" },
-          y: { field: "min_value", type: "quantitative", title: "Value" },
+          x: {
+            field: "timestamp",
+            type: "temporal",
+            title: "",
+            axis: {
+              tickColor: {
+                condition: { value: chartColor, test: "true" },
+                value: chartColor,
+              },
+              gridColor: chartColor,
+              gridOpacity: 0.3,
+              domainColor: chartColor,
+            },
+          },
+          y: {
+            field: "min_value",
+            type: "quantitative",
+            title: "",
+            axis: {
+              tickColor: {
+                condition: { value: chartColor, test: "true" },
+                value: chartColor,
+              },
+              gridColor: chartColor,
+              gridOpacity: 0.3,
+              domainColor: chartColor,
+            },
+          },
           y2: { field: "max_value" },
         },
         transform: [
@@ -112,7 +159,7 @@ export const VegaLiteHighlightedChart = ({
     <VegaLite
       spec={spec}
       style={{ cursor: "pointer" }}
-      className={cn("flex-1", className, "rounded-sm overflow-hidden min-h-40")}
+      className={cn("flex-1", "rounded-sm overflow-hidden min-h-20 h-full")}
     />
   );
 };

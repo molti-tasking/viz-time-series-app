@@ -10,9 +10,16 @@ export const highlighter = (
     timestamp: number;
     entries: [string, number][];
   }[]
-): { dimension: string; opacity: number }[][] => {
-  const aggregatedHighlightInfo: { dimension: string; opacity: number }[][] =
-    [];
+): {
+  dimension: string;
+  opacity: number;
+  lastDimension: number | undefined;
+}[][] => {
+  const aggregatedHighlightInfo: {
+    dimension: string;
+    opacity: number;
+    lastDimension: number | undefined;
+  }[][] = [];
 
   for (let clusterIndex = 0; clusterIndex < aggregated.length; clusterIndex++) {
     const cluster = aggregated[clusterIndex];
@@ -28,8 +35,11 @@ export const highlighter = (
     // 2. Check for how many of the past clusters it had a different cluster.
     // 3. The more different clusters it has, the higher the opacity.
 
-    const timeSeriesToBeHighlighted: { dimension: string; opacity: number }[] =
-      [];
+    const timeSeriesToBeHighlighted: {
+      dimension: string;
+      opacity: number;
+      lastDimension: number | undefined;
+    }[] = [];
 
     for (let dimIndex = 0; dimIndex < dimensions.length; dimIndex++) {
       const dimension = dimensions[dimIndex];
@@ -38,7 +48,7 @@ export const highlighter = (
       )?.[1];
 
       let differentClustersInPast = 0;
-
+      let lastDimension: number | undefined = undefined;
       for (
         let clusterIndex = 0;
         clusterIndex < clusterAssignmentHistory.length;
@@ -52,13 +62,16 @@ export const highlighter = (
         const isSameCluster = currentCluster === pastCluster;
         if (!isSameCluster) {
           differentClustersInPast = differentClustersInPast + 1;
+          if (!lastDimension) {
+            lastDimension = pastCluster;
+          }
         }
       }
 
       if (differentClustersInPast > 0) {
         const opacity =
           differentClustersInPast / clusterAssignmentHistory.length;
-        timeSeriesToBeHighlighted.push({ dimension, opacity });
+        timeSeriesToBeHighlighted.push({ dimension, opacity, lastDimension });
       }
     }
 

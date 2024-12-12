@@ -47,7 +47,7 @@ const ChartGrid = () => {
   return (
     <div
       ref={ref}
-      className={cn("flex-1 grid gap-2 overflow-scroll")}
+      className={cn("flex-1 grid gap-0.5 overflow-scroll auto-rows-fr")}
       style={{ gridTemplateColumns: `repeat(${gridCols}, minmax(0, 1fr))` }}
     >
       <Charts />
@@ -123,11 +123,12 @@ const Charts = memo(() => {
           <VegaLiteHighlightedChart
             values={val}
             key={index}
-            className={clusterColors[index % clusterColors.length]}
+            className={""}
             yDomain={yDomain}
             mode={mode}
             saveScreenSpace={saveScreenSpace}
             highlightInfo={highlightInfo?.[index]}
+            chartColor={clusterColors[index % clusterColors.length]}
           />
         ))}
       </>

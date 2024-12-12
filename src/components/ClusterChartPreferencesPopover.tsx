@@ -328,7 +328,7 @@ const SettingsForm = ({ onClose }: { onClose: () => void }) => {
       </div> */}
 
           <div className="grid grid-cols-2 gap-4">
-            <Button variant={"outline"} onClick={() => onClose()}>
+            <Button variant={"outline"} onClick={() => onClose()} type="button">
               Close
             </Button>
             <Button type="submit">Submit</Button>

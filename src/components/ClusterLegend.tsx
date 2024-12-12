@@ -23,7 +23,9 @@ export const ClusterLegend = () => {
       onClick={() => setShowHistory((currValue) => !currValue)}
     >
       {showHistory && <HistoryBars />}
-      <LegendBar entries={clusterAssignment} />
+      <div className="w-full rounded-sm overflow-hidden opacity-70">
+        <LegendBar entries={clusterAssignment} />
+      </div>
     </div>
   );
 };
@@ -37,7 +39,7 @@ const HistoryBars = () => {
   ).slice(0, clusterAssignmentHistoryDepth);
 
   return (
-    <div className="flex flex-col-reverse w-full animate-pulse">
+    <div className="flex flex-col-reverse w-full rounded-sm overflow-hidden">
       {clusterAssignmentHistory.map(({ timestamp, entries }, index) => {
         const opacity = (
           (clusterAssignmentHistory.length - index) /
@@ -67,10 +69,12 @@ const LegendBar = ({ entries }: { entries: [string, number][] }) => {
             <TooltipTrigger asChild>
               <div
                 className={cn(
-                  clusterColors[styleGroup % clusterColors.length],
                   "flex-1 h-4",
                   index > 0 ? "border-l-[0.5px]" : ""
                 )}
+                style={{
+                  background: clusterColors[styleGroup % clusterColors.length],
+                }}
               ></div>
             </TooltipTrigger>
             <TooltipContent>{name}</TooltipContent>
