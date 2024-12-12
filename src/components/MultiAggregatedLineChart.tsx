@@ -3,13 +3,12 @@ import { useRawDataStore } from "@/store/useRawDataStore";
 import { useViewModelStore } from "@/store/useViewModelStore";
 import { useViewSettingsStore } from "@/store/useViewSettingsStore";
 import { AlertCircleIcon } from "lucide-react";
-import { memo, useEffect, useRef } from "react";
+import { memo, useEffect } from "react";
 import { PlotlyChart } from "./charts/PlotlyChart";
 import { VegaLiteChart } from "./charts/VegaLiteChart";
 import { VegaLiteHighlightedChart } from "./charts/VegaLiteHighlightedChart";
 import { clusterColors } from "./clusterColors";
 import { ClusterLegend } from "./ClusterLegend";
-import { useContainerDimensions } from "./useContainerDimensions";
 
 // TODO: Make this chart mostly recursive in a way that a user sees a subset whenever he selects one of those charts
 
@@ -34,8 +33,8 @@ export const MultiAggregatedLineChart = () => {
 };
 
 const ChartGrid = () => {
-  const ref = useRef<HTMLDivElement>(null);
-  const { height, width } = useContainerDimensions(ref);
+  // const ref = useRef<HTMLDivElement>(null);
+  // const { height, width } = useContainerDimensions(ref);
 
   const aggregated = useViewModelStore((state) => state.aggregated);
   const amountOfCharts = aggregated.length;
@@ -43,10 +42,9 @@ const ChartGrid = () => {
   const gridCols = Math.floor(Math.sqrt(amountOfCharts));
 
   // Now we need to calculate best amount of columns that we want to have...
-  console.log({ height, width });
   return (
     <div
-      ref={ref}
+      // ref={ref}
       className={cn("flex-1 grid gap-0.5 overflow-scroll auto-rows-fr")}
       style={{ gridTemplateColumns: `repeat(${gridCols}, minmax(0, 1fr))` }}
     >

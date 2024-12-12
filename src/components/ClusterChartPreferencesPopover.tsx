@@ -19,6 +19,7 @@ import {
   ChartPresentationSettings,
   chartPresentationSettingsSchema,
 } from "@/lib/ChartPresentationSettings";
+import { useExploratoryStore } from "@/store/useExploratoryStore";
 import { useViewSettingsStore } from "@/store/useViewSettingsStore";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ChevronDownIcon } from "lucide-react";
@@ -61,6 +62,9 @@ const ignoreBoringDataModeOptions: Record<
 
 const SettingsForm = ({ onClose }: { onClose: () => void }) => {
   const viewSettings = useViewSettingsStore();
+  const addSettingUpdateEvent = useExploratoryStore(
+    (state) => state.addSettingUpdateEvent
+  );
   const { updateSettings, ...settings } = viewSettings;
 
   const form = useForm<ChartPresentationSettings>({
@@ -69,6 +73,7 @@ const SettingsForm = ({ onClose }: { onClose: () => void }) => {
   });
 
   const onSubmit = (data: ChartPresentationSettings) => {
+    addSettingUpdateEvent(settings, data);
     updateSettings((prevSettings) => ({ ...prevSettings, ...data }));
 
     onClose();

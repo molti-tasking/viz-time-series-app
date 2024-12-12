@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { useExploratoryStore } from "@/store/useExploratoryStore";
 import { VegaLite, type VisualizationSpec } from "react-vega";
 import { clusterColors } from "../clusterColors";
 import { ChartProps } from "./ChartProps";
@@ -155,11 +156,35 @@ export const VegaLiteHighlightedChart = ({
     ],
   };
 
+  const isSelecting = useExploratoryStore((state) => state.isSelecting);
+  const addDataIdeaEvent = useExploratoryStore(
+    (state) => state.addDataIdeaEvent
+  );
+
   return (
-    <VegaLite
-      spec={spec}
-      style={{ cursor: "pointer" }}
-      className={cn("flex-1", "rounded-sm overflow-hidden min-h-20 h-full")}
-    />
+    <div
+      onClick={() =>
+        isSelecting &&
+        addDataIdeaEvent({
+          vegaLiteSpec: spec,
+        })
+      }
+      className={cn(
+        "flex-1",
+        "rounded-sm overflow-hidden min-h-20 h-full",
+        isSelecting
+          ? "hover:-translate-y-0.5 hover:bg-gray-50 hover:shadow-lg rounded-lg overflow-hidden transition-all duration-300"
+          : ""
+      )}
+    >
+      <VegaLite
+        spec={spec}
+        style={{ cursor: isSelecting ? "grab" : "initial" }}
+        className={cn(
+          "w-full h-full flex flex-1",
+          "rounded-sm overflow-hidden min-h-20 h-full"
+        )}
+      />
+    </div>
   );
 };
