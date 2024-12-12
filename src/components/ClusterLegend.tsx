@@ -1,6 +1,7 @@
 import { cn } from "@/lib/utils";
 import { useViewModelStore } from "@/store/useViewModelStore";
 import { useViewSettingsStore } from "@/store/useViewSettingsStore";
+import { useState } from "react";
 import { clusterColors } from "./clusterColors";
 import {
   Tooltip,
@@ -13,6 +14,21 @@ export const ClusterLegend = () => {
   const clusterAssignment = useViewModelStore(
     (state) => state.clusterAssignment
   );
+
+  const [showHistory, setShowHistory] = useState<boolean>(false);
+
+  return (
+    <div
+      className="flex flex-col w-full gap-1 cursor-pointer"
+      onClick={() => setShowHistory((currValue) => !currValue)}
+    >
+      {showHistory && <HistoryBars />}
+      <LegendBar entries={clusterAssignment} />
+    </div>
+  );
+};
+
+const HistoryBars = () => {
   const clusterAssignmentHistoryDepth = useViewSettingsStore(
     (state) => state.clusterAssignmentHistoryDepth
   );
@@ -21,26 +37,23 @@ export const ClusterLegend = () => {
   ).slice(0, clusterAssignmentHistoryDepth);
 
   return (
-    <div className="flex flex-col w-full gap-1">
-      <div className="flex flex-col-reverse w-full">
-        {clusterAssignmentHistory.map(({ timestamp, entries }, index) => {
-          const opacity = (
-            (clusterAssignmentHistory.length - index) /
-            (clusterAssignmentHistory.length + 3)
-          ).toFixed(2);
+    <div className="flex flex-col-reverse w-full animate-pulse">
+      {clusterAssignmentHistory.map(({ timestamp, entries }, index) => {
+        const opacity = (
+          (clusterAssignmentHistory.length - index) /
+          (clusterAssignmentHistory.length + 3)
+        ).toFixed(2);
 
-          return (
-            <div
-              key={`${timestamp}-${index}`}
-              style={{ opacity }}
-              className={cn("w-full")}
-            >
-              <LegendBar entries={entries} />
-            </div>
-          );
-        })}
-      </div>
-      <LegendBar entries={clusterAssignment} />
+        return (
+          <div
+            key={`${timestamp}-${index}`}
+            style={{ opacity }}
+            className={cn("w-full")}
+          >
+            <LegendBar entries={entries} />
+          </div>
+        );
+      })}
     </div>
   );
 };
