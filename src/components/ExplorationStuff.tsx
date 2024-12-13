@@ -10,7 +10,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useExploratoryStore } from "@/store/useExploratoryStore";
-import { MountainIcon, StarsIcon } from "lucide-react";
+import { Loader2, MountainIcon, StarsIcon } from "lucide-react";
+import { useState } from "react";
 
 export const ExplorationStuff = () => {
   const activateIdeaSelection = useExploratoryStore(
@@ -20,13 +21,21 @@ export const ExplorationStuff = () => {
     (state) => state.requestSuggestion
   );
   const events = useExploratoryStore((state) => state.events);
+  const suggestion = useExploratoryStore((state) => state.suggestion);
+
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const onRequest = async () => {
+    setIsLoading(true);
+    await requestSuggestion().finally(() => setIsLoading(false));
+  };
 
   return (
     <Dialog>
       <DialogTrigger>
         <StarsIcon />
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="max-w-4xl">
         <DialogHeader>
           <DialogTitle>AI Data Exploration</DialogTitle>
           <DialogDescription>
@@ -38,6 +47,20 @@ export const ExplorationStuff = () => {
         <div className="my-2">
           You already collected {events.length} Events.
         </div>
+
+        {suggestion && (
+          <div className="py-2">
+            <strong className="flex items-center gap-2 mb-2">
+              AI Suggestion <StarsIcon />
+            </strong>
+
+            <div className="bg-blue-100 rounded-md p-4">
+              <pre className="whitespace-break-spaces max-h-80 overflow-scroll">
+                {suggestion}
+              </pre>
+            </div>
+          </div>
+        )}
         <DialogFooter>
           <DialogClose>
             <Button
@@ -49,10 +72,15 @@ export const ExplorationStuff = () => {
           </DialogClose>
           <Button
             variant={"secondary"}
-            disabled={!events.length}
-            onClick={() => requestSuggestion()}
+            disabled={!events.length || isLoading}
+            onClick={onRequest}
           >
-            <StarsIcon className="mr-2" /> Generate Hypothesis
+            {isLoading ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <StarsIcon className="mr-2" />
+            )}
+            Generate Hypothesis
           </Button>
         </DialogFooter>
       </DialogContent>

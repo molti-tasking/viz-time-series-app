@@ -4,9 +4,10 @@ import { Input } from "@/components/ui/input";
 import { ToastAction } from "@/components/ui/toast";
 import { toast } from "@/hooks/use-toast";
 import { ChartPresentationSettings } from "@/lib/ChartPresentationSettings";
+import { fetchResearchCompletion } from "@/lib/ai-chat";
 import { useState } from "react";
 
-type ExplorationEvent = {
+export type ExplorationEvent = {
   userMessage?: string | undefined;
   systemMessage?: string | undefined;
   payload: object;
@@ -24,7 +25,7 @@ interface DataStore {
   ) => void;
   addDataIdeaEvent: (payload: object) => void;
 
-  requestSuggestion: () => void;
+  requestSuggestion: () => Promise<void>;
 }
 
 const FeedbackForm = ({
@@ -36,7 +37,7 @@ const FeedbackForm = ({
 
   return (
     <div>
-      <div className="max-w-sm">
+      <div className="max-w-sm mb-1">
         <Input
           type="search"
           id="clusterAssignmentHistoryDepth"
@@ -45,19 +46,21 @@ const FeedbackForm = ({
           onChange={(e) => setFeedback(e.target.value)}
         />
       </div>
-      <ToastAction
-        onClick={() => onSubmitFeedback(true, feedback)}
-        altText="Good"
-      >
-        Good
-      </ToastAction>
+      <div className="flex flex-row gap-1 items-center">
+        <ToastAction
+          onClick={() => onSubmitFeedback(true, feedback)}
+          altText="Good"
+        >
+          Good
+        </ToastAction>
 
-      <ToastAction
-        onClick={() => onSubmitFeedback(false, feedback)}
-        altText="Bad"
-      >
-        Bad
-      </ToastAction>
+        <ToastAction
+          onClick={() => onSubmitFeedback(false, feedback)}
+          altText="Bad"
+        >
+          Bad
+        </ToastAction>
+      </div>
     </div>
   );
 };
@@ -81,8 +84,8 @@ export const useExploratoryStore = create<DataStore>((set, get) => {
     };
 
     toast({
-      title: "Uh oh! Something went wrong.",
-      description: "There was a problem with your request.",
+      title: "You updated the view settings.",
+      description: "How helpful was it?",
       action: <FeedbackForm onSubmitFeedback={onSubmitFeedback} />,
     });
   };
@@ -130,8 +133,20 @@ export const useExploratoryStore = create<DataStore>((set, get) => {
     set({ events: newUserEvents });
   };
 
-  const requestSuggestion = () => {
-    alert("This says the AI: What's up?");
+  const requestSuggestion = async () => {
+    try {
+      const answer = await fetchResearchCompletion(get().events);
+      console.log("answer", answer);
+      if (typeof answer === "string") {
+        set({ suggestion: answer });
+      }
+    } catch (error) {
+      alert(
+        `We couldn't generate data: ${String(
+          "message" in error ? error.message : error
+        )}`
+      );
+    }
   };
 
   return {
