@@ -30,6 +30,7 @@ export const VegaLiteHighlightedChart = ({
 
     data: { values },
     transform: [{ fold: dimensions, as: ["variable", "value"] }],
+
     mark: "line",
     encoding: {
       x: {
@@ -180,6 +181,7 @@ export const VegaLiteHighlightedChart = ({
       <VegaLite
         spec={spec}
         style={{ cursor: isSelecting ? "grab" : "initial" }}
+        actions={false}
         className={cn(
           "w-full h-full flex flex-1",
           "rounded-sm overflow-hidden min-h-20 h-full"
