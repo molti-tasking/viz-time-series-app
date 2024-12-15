@@ -143,7 +143,7 @@ export const useExploratoryStore = create<DataStore>((set, get) => {
     } catch (error) {
       alert(
         `We couldn't generate data: ${String(
-          "message" in error ? error.message : error
+          error instanceof Error ? error.message : error
         )}`
       );
     }
