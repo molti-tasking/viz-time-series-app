@@ -19,7 +19,7 @@ export default function Root() {
         <div className="container flex items-center flex-wrap justify-between gap-x-6 gap-y-2">
           <div className="text-white flex items-center gap-4">
             <span className="font-semibold text-xl tracking-tight">
-              Time VIS
+              Stream Sight
             </span>
             <ExplorationStuff />
           </div>
