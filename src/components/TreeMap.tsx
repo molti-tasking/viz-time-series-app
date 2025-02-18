@@ -1,33 +1,37 @@
 import * as d3 from "d3";
 import { useEffect, useRef } from "react";
 
-export const TreeMap = () => {
+interface TreeMapProps {
+  height?: number;
+  width?: number;
+
+  leaves: {
+    name: string;
+    /**
+     * The significance of the leaf to be indicating the size of the children component.
+     */
+    significance: number;
+    children: React.ReactNode;
+  }[];
+}
+
+export const TreeMap = ({
+  height = 400,
+  width = 600,
+  ...props
+}: TreeMapProps) => {
   const svgRef = useRef(null);
 
-  useEffect(() => {
+  const buildTreemap = () => {
     // Sample data (feel free to replace with your own)
     const data = {
-      name: "flare",
       children: [
-        {
-          name: "analytics",
-          children: [
-            { name: "cluster", size: 3938 },
-            { name: "graph", size: 3534 },
-          ],
-        },
-        {
-          name: "animate",
-          children: [
-            { name: "Easing", size: 17010 },
-            { name: "FunctionSequence", size: 5842 },
-          ],
-        },
+        ...props.leaves.map((leaf) => ({
+          name: leaf.name,
+          size: leaf.significance,
+        })),
       ],
     };
-
-    const width = 600;
-    const height = 400;
 
     // 1. Construct a root node with d3.hierarchy
     // 2. Sum values for each node.
@@ -41,7 +45,7 @@ export const TreeMap = () => {
     d3
       .treemap()
       .size([width, height]) // set the size of the treemap
-      .padding(1)(
+      .padding(4)(
       // add some padding around cells
       root
     );
@@ -67,7 +71,7 @@ export const TreeMap = () => {
       .append("rect")
       .attr("width", (d) => d.x1 - d.x0)
       .attr("height", (d) => d.y1 - d.y0)
-      .attr("fill", (d) => color(d.parent.data.name));
+      .attr("fill", (d) => color(d.data.name));
 
     // Append text labels
     leaves
@@ -77,7 +81,11 @@ export const TreeMap = () => {
       .attr("fill", "white") // you might change text color or style
       .style("font-size", "12px")
       .text((d) => d.data.name);
-  }, []);
+  };
+
+  useEffect(() => {
+    buildTreemap();
+  }, [height, width, props.leaves]);
 
   return <svg ref={svgRef} />;
 };

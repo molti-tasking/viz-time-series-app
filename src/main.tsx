@@ -1,12 +1,13 @@
 import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { TreeMap } from "./components/TreeMap";
 import ErrorPage from "./error-page";
 import "./index.css";
 import AggrLine from "./routes/aggregated-line";
 import Anu from "./routes/anu";
+import Home from "./routes/home";
 import MutliAggregatedLine from "./routes/multi-aggregated-line";
+import MutliAggregatedTreeMap from "./routes/multi-aggregated-treemap";
 import MultiLine from "./routes/multi-line";
 import Root from "./routes/root";
 
@@ -17,7 +18,7 @@ const router = createBrowserRouter([
     errorElement: <ErrorPage />,
 
     children: [
-      { path: "", element: <TreeMap /> },
+      { path: "", element: <Home /> },
       { path: "anu", element: <Anu />, errorElement: <ErrorPage /> },
       {
         path: "multi-line",
@@ -32,6 +33,11 @@ const router = createBrowserRouter([
       {
         path: "multi-aggregated-line",
         element: <MutliAggregatedLine />,
+        errorElement: <ErrorPage />,
+      },
+      {
+        path: "multi-aggregated-treemap",
+        element: <MutliAggregatedTreeMap />,
         errorElement: <ErrorPage />,
       },
     ],

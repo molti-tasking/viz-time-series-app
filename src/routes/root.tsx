@@ -10,6 +10,7 @@ export default function Root() {
     { title: "Multi Line", href: "multi-line" },
     { title: "Aggregation", href: "aggregated-line" },
     { title: "Multi Aggregation", href: "multi-aggregated-line" },
+    { title: "Tree Map", href: "multi-aggregated-treemap" },
   ];
 
   return (
