@@ -1,4 +1,6 @@
+import { VegaLiteHighlightedChart } from "@/components/charts/VegaLiteHighlightedChart";
 import { ClusterChartPreferencesPopover } from "@/components/ClusterChartPreferencesPopover";
+import { clusterColors } from "@/components/clusterColors";
 import { TreeMap } from "@/components/TreeMap";
 import { useContainerDimensions } from "@/components/useContainerDimensions";
 import { useViewModelStore } from "@/store/useViewModelStore";
@@ -8,6 +10,8 @@ import { useRef } from "react";
 export default function MutliAggregatedTreeMap() {
   const mode = useViewSettingsStore((state) => state.mode);
   const aggregated = useViewModelStore((data) => data.aggregated);
+  const highlightInfo = useViewModelStore((state) => state.highlightInfo);
+  const yDomain = useViewModelStore((state) => state.yDomain);
 
   const ref = useRef<HTMLDivElement>(null);
   const { height, width } = useContainerDimensions(ref);
@@ -25,7 +29,7 @@ export default function MutliAggregatedTreeMap() {
       <div ref={ref}>
         <TreeMap
           width={width}
-          leaves={aggregated.map((clusters) => {
+          leaves={aggregated.map((clusters, index) => {
             const columns = Object.keys(clusters[0]).filter(
               (_, index) => index !== 0
             );
@@ -35,7 +39,17 @@ export default function MutliAggregatedTreeMap() {
             return {
               name,
               significance,
-              children: <div>Test Cluster</div>,
+              children: (
+                <VegaLiteHighlightedChart
+                  values={clusters}
+                  key={index}
+                  className={"w-full h-full"}
+                  yDomain={yDomain}
+                  mode={mode}
+                  highlightInfo={highlightInfo?.[index]}
+                  chartColor={clusterColors[index % clusterColors.length]}
+                />
+              ),
             };
           })}
         />
