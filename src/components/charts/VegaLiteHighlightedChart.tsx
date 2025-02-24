@@ -24,9 +24,16 @@ export const VegaLiteHighlightedChart = ({
 
   const spec: VisualizationSpec = {
     $schema: "https://vega.github.io/schema/vega-lite/v5.json",
+
+    padding: 0,
     width: "container",
     height: "container",
     background: "transparent",
+    // Try to ensure it resizes to fill container space without extra padding
+    autosize: {
+      type: "fit",
+      contains: "padding",
+    },
 
     data: { values },
     transform: [{ fold: dimensions, as: ["variable", "value"] }],
@@ -36,12 +43,24 @@ export const VegaLiteHighlightedChart = ({
       x: {
         field: "timestamp",
         type: !!saveScreenSpace ? "ordinal" : "temporal",
-        axis: !!saveScreenSpace ? { labelExpr: "" } : undefined,
+        axis: !!saveScreenSpace
+          ? { labelExpr: "" }
+          : {
+              // labelPadding: -20,
+              // ticks: false,
+              // domain: false,
+            },
       },
       y: {
         field: "value",
         type: "quantitative",
         scale: { domain: yDomain },
+        axis: {
+          labelPadding: -20,
+          labelOpacity: 0.5,
+          ticks: false,
+          domain: false,
+        },
       },
       color: { legend: null },
     },

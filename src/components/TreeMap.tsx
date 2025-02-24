@@ -1,6 +1,11 @@
 import * as d3 from "d3";
 import { useEffect, useRef, useState } from "react";
 
+type ClusterComponentType = (props: {
+  totalMaxWidth: number;
+  currentWidth: number;
+}) => React.ReactNode;
+
 interface TreeMapProps {
   height?: number;
   width?: number;
@@ -11,7 +16,7 @@ interface TreeMapProps {
      * The significance of the leaf to be indicating the size of the children component.
      */
     significance: number;
-    children: React.ReactNode;
+    ClusterComponent: ClusterComponentType;
   }[];
 }
 
@@ -21,13 +26,14 @@ export const TreeMap = ({
   ...props
 }: TreeMapProps) => {
   const svgRef = useRef<SVGSVGElement>(null);
+  const [maxWidth, setMaxWidth] = useState<number>(0);
   const [nodes, setNodes] = useState<
     {
       x: number;
       y: number;
       width: number;
       height: number;
-      children: React.ReactNode;
+      ClusterComponent: ClusterComponentType;
     }[]
   >([]);
 
@@ -38,7 +44,7 @@ export const TreeMap = ({
         ...props.leaves.map((leaf) => ({
           name: leaf.name,
           size: leaf.significance,
-          children: leaf.children,
+          ClusterComponent: leaf.ClusterComponent,
         })),
       ],
     };
@@ -53,16 +59,23 @@ export const TreeMap = ({
 
     // Initialize treemap layout
     d3.treemap().size([width, height]).padding(4)(root);
-
-    const newNodes = root.leaves().map((d) => ({
-      x: d.x0,
-      y: d.y0,
-      width: d.x1 - d.x0,
-      height: d.y1 - d.y0,
-      children: d.data.children,
-    }));
+    let newMaxWidth = 0;
+    const newNodes = root.leaves().map((d) => {
+      const width = d.x1 - d.x0;
+      if (width > newMaxWidth) {
+        newMaxWidth = width;
+      }
+      return {
+        x: d.x0,
+        y: d.y0,
+        width,
+        height: d.y1 - d.y0,
+        ClusterComponent: d.data.ClusterComponent,
+      };
+    });
 
     setNodes(newNodes);
+    setMaxWidth(newMaxWidth);
 
     // Select the <svg> element and set up attributes
     const svg = d3
@@ -71,7 +84,7 @@ export const TreeMap = ({
       .attr("height", height);
 
     // Create a color scale for rectangles
-    const color = d3.scaleOrdinal(d3.schemeCategory10);
+    // const color = d3.scaleOrdinal(d3.schemeCategory10);
 
     // Bind data for each leaf node
     const leaves = svg
@@ -84,8 +97,8 @@ export const TreeMap = ({
       .append("rect")
       .attr("width", (d) => d.x1 - d.x0)
       .attr("height", (d) => d.y1 - d.y0)
-      .attr("fill", (d) => "#eee")
-      .attr("fill-opacity", 0.1);
+      .attr("fill", () => "#eee")
+      .attr("fill-opacity", 0.2);
   };
 
   useEffect(() => {
@@ -95,22 +108,22 @@ export const TreeMap = ({
   return (
     <div style={{ position: "relative", width, height }}>
       <svg ref={svgRef} style={{ position: "absolute", top: 0, left: 0 }} />
-      {nodes.map((node, index) => (
+      {nodes.map(({ x, y, width, height, ClusterComponent }, index) => (
         <div
           key={index}
           style={{
             position: "absolute",
-            left: node.x,
-            top: node.y,
-            width: node.width,
-            height: node.height,
+            left: x,
+            top: y,
+            width: width,
+            height: height,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             overflow: "hidden",
           }}
         >
-          {node.children}
+          <ClusterComponent currentWidth={width} totalMaxWidth={maxWidth} />
         </div>
       ))}
     </div>
