@@ -1,5 +1,4 @@
-import { loadHouseholdData } from "@/data/loadHouseholdData";
-import { streamStockSP500Data } from "@/data/streamStockSP500Data";
+import { DataSet, streamDataSet } from "@/data/streamDataSet";
 import { create } from "zustand";
 
 interface DataStore {
@@ -9,7 +8,7 @@ interface DataStore {
   streamingInterval: number | null;
   intervalId: NodeJS.Timeout | null;
 
-  loadDataset: (dataset: "household" | "stocks") => void;
+  loadDataset: (dataset: DataSet) => void;
 
   updateData: (
     mode: "random" | "peaks",
@@ -27,46 +26,35 @@ export const useRawDataStore = create<DataStore>((set, get) => {
     streamingInterval: null,
     intervalId: null,
 
-    loadDataset: async (dataset: "household" | "stocks") => {
+    loadDataset: async (dataset: DataSet) => {
       const { intervalId } = get();
 
       if (intervalId) clearInterval(intervalId);
 
-      let dimensions: string[] = [];
+      console.log("Load dataset: ", dataset);
 
-      if (dataset === "household") {
-        const houseHoldData = loadHouseholdData();
-        dimensions = Object.keys(houseHoldData[0]).filter(
-          (col) => col !== "timestamp"
-        );
+      set({ values: [], dimensions: [] });
+      console.log("Resetted values and dimensions.");
 
-        set({ values: houseHoldData, dimensions });
-      } else if (dataset === "stocks") {
-        console.log("Load stock data.");
+      const dataEntries = streamDataSet(dataset);
 
-        set({ values: [], dimensions: [] });
-        console.log("Resetted values and dimensions.");
+      for await (const dataEntry of dataEntries) {
+        console.log("Yielded next entry of the data timeline: ", dataEntry);
 
-        const stockData = streamStockSP500Data();
+        const { values: prevValues, dimensions } = get();
+        const newValues = [...(prevValues as any[]), dataEntry];
+        console.log("New values length: ", newValues.length);
 
-        for await (const stock of stockData) {
-          console.log("Yielded next entry of the stock timeline: ", stock);
+        set({ values: newValues });
 
-          const { values: prevValues, dimensions } = get();
-          const newValues = [...(prevValues as any[]), stock];
-          console.log("New values length: ", newValues.length);
+        if (!dimensions.length) {
+          console.log("No dimensions set, set new values here.");
+          const newDimensions = Object.keys(dataEntry).filter(
+            (col) => col !== "timestamp"
+          );
 
-          set({ values: newValues });
-
-          if (!dimensions.length) {
-            console.log("No dimensions set, set new values here.");
-            const newDimensions = Object.keys(stock).filter(
-              (col) => col !== "timestamp"
-            );
-
-            console.log("New dimensions length: ", newDimensions.length);
-            set({ dimensions: newDimensions });
-          }
+          console.log("New dimensions length: ", newDimensions.length);
+          set({ dimensions: newDimensions });
         }
       }
       set({

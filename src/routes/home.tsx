@@ -32,10 +32,8 @@ export default function Home() {
           Create initial data
         </Button>
 
-        <Button onClick={() => loadDataset("household")}>
-          House hold data
-        </Button>
-        <Button onClick={() => loadDataset("stocks")}>Stock data</Button>
+        <Button onClick={() => loadDataset("GDP")}>Stream UN GDP</Button>
+        <Button onClick={() => loadDataset("S&P500")}>Stream S&P 500</Button>
       </div>
     </div>
   );
