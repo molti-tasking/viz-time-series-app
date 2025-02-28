@@ -38,11 +38,11 @@ export const TreeMap = ({
   >([]);
 
   const buildTreemap = () => {
-    console.log("Build treemap");
+    console.log("Build treemap with leaves: ", props.leaves.length);
     // Sample data (feel free to replace with your own)
     const data = {
       children: [
-        ...props.leaves.map((leaf) => ({
+        ...props.leaves?.map((leaf) => ({
           name: leaf.name,
           size: leaf.significance,
           ClusterComponent: leaf.ClusterComponent,
@@ -61,7 +61,7 @@ export const TreeMap = ({
     // Initialize treemap layout
     d3.treemap().size([width, height]).padding(4)(root);
     let newMaxWidth = 0;
-    const newNodes = root.leaves().map((d) => {
+    const newNodes = root.leaves()?.map((d) => {
       const width = d.x1 - d.x0;
       if (width > newMaxWidth) {
         newMaxWidth = width;
@@ -105,7 +105,7 @@ export const TreeMap = ({
   useEffect(() => {
     buildTreemap();
   }, [height, width, props.leaves]);
-  console.log("Render treemap: ", height, width, props.leaves);
+  console.log("Render treemap with leaves: ", props.leaves?.length);
   return (
     <div style={{ position: "relative", width, height }}>
       <svg ref={svgRef} style={{ position: "absolute", top: 0, left: 0 }} />

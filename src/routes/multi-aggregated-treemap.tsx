@@ -27,7 +27,7 @@ export default function MutliAggregatedTreeMap() {
     processData();
   }, [presentationSettings, values]);
 
-  console.log("Aggregated treemap");
+  console.log("Render aggregated treemap");
   return (
     <div className="container w-full py-2 flex flex-col flex-wrap gap-2 h-full">
       <div className="flex flex-row justify-between gap-4 items-center">
@@ -43,7 +43,6 @@ export default function MutliAggregatedTreeMap() {
           width={width}
           height={height}
           leaves={aggregated.map((clusters, index) => {
-            console.count("Treemap Leave");
             const columns = Object.keys(clusters[0]).filter(
               (_, index) => index !== 0
             );
@@ -54,7 +53,6 @@ export default function MutliAggregatedTreeMap() {
               name,
               significance,
               ClusterComponent: ({ currentWidth, totalMaxWidth }) => {
-                console.count("Cluster component");
                 // In this function we calculate the last few entries for each cluster based on the available space:
                 // We want to display the same amount of time per pixel accross all the different time series.
                 // So depending on available screen width we want only keep the latest entries that fit into the available space.
