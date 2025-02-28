@@ -1,5 +1,5 @@
 import { loadHouseholdData } from "@/data/loadHouseholdData";
-import { loadStockData } from "@/data/loadStockData";
+import { streamStockSP500Data } from "@/data/streamStockSP500Data";
 import { create } from "zustand";
 
 interface DataStore {
@@ -27,33 +27,51 @@ export const useRawDataStore = create<DataStore>((set, get) => {
     streamingInterval: null,
     intervalId: null,
 
-    loadDataset: (dataset: "household" | "stocks") => {
+    loadDataset: async (dataset: "household" | "stocks") => {
       const { intervalId } = get();
 
       if (intervalId) clearInterval(intervalId);
 
       let dimensions: string[] = [];
-      let values: Record<string, number>[] = [];
 
       if (dataset === "household") {
         const houseHoldData = loadHouseholdData();
-        values = houseHoldData;
         dimensions = Object.keys(houseHoldData[0]).filter(
           (col) => col !== "timestamp"
         );
+
+        set({ values: houseHoldData, dimensions });
       } else if (dataset === "stocks") {
-        const stockData = loadStockData();
-        values = stockData;
-        dimensions = Object.keys(stockData[0]).filter(
-          (col) => col !== "timestamp"
-        );
+        console.log("Load stock data.");
+
+        set({ values: [], dimensions: [] });
+        console.log("Resetted values and dimensions.");
+
+        const stockData = streamStockSP500Data();
+
+        for await (const stock of stockData) {
+          console.log("Yielded next entry of the stock timeline: ", stock);
+
+          const { values: prevValues, dimensions } = get();
+          const newValues = [...(prevValues as any[]), stock];
+          console.log("New values length: ", newValues.length);
+
+          set({ values: newValues });
+
+          if (!dimensions.length) {
+            console.log("No dimensions set, set new values here.");
+            const newDimensions = Object.keys(stock).filter(
+              (col) => col !== "timestamp"
+            );
+
+            console.log("New dimensions length: ", newDimensions.length);
+            set({ dimensions: newDimensions });
+          }
+        }
       }
       set({
         streamingInterval: null,
         intervalId: null,
-
-        values,
-        dimensions,
       });
     },
 
