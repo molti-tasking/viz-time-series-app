@@ -38,6 +38,7 @@ export const TreeMap = ({
   >([]);
 
   const buildTreemap = () => {
+    console.log("Build treemap");
     // Sample data (feel free to replace with your own)
     const data = {
       children: [
@@ -104,7 +105,7 @@ export const TreeMap = ({
   useEffect(() => {
     buildTreemap();
   }, [height, width, props.leaves]);
-
+  console.log("Render treemap: ", height, width, props.leaves);
   return (
     <div style={{ position: "relative", width, height }}>
       <svg ref={svgRef} style={{ position: "absolute", top: 0, left: 0 }} />
