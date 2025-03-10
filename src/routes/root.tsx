@@ -1,11 +1,12 @@
-import { DataSettingsPopover } from "@/components/DataSettingsPopover";
 import { ExplorationStuff } from "@/components/ExplorationStuff";
+import { DataSettingsPopover } from "@/components/forms/DataSettingsPopover";
 import { Toaster } from "@/components/ui/toaster";
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet } from "react-router";
 
 export default function Root() {
   const routes = [
     { title: "Home", href: "" },
+    { title: "Streamclusters", href: "streamclusters" },
     { title: "3D", href: "anu" },
     { title: "Multi Line", href: "multi-line" },
     { title: "Aggregation", href: "aggregated-line" },

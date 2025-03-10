@@ -1,9 +1,9 @@
-import { ChartPresentationSettings } from "./ChartPresentationSettings";
 import { findCommonElements } from "./findCommonElements";
+import { DataProcessingSettings } from "./settings/DataProcessingSettings";
 
 export const dataWrappingProcess = (
   aggregated: Record<string, number>[][],
-  settings: ChartPresentationSettings
+  settings: DataProcessingSettings
 ) => {
   const { meanRange, tickRange, ignoreBoringDataMode } = settings;
   if (ignoreBoringDataMode === "standard" && !!meanRange && !!tickRange) {

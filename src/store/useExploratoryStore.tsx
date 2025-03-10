@@ -1,11 +1,10 @@
-import { create } from "zustand";
-
 import { Input } from "@/components/ui/input";
 import { ToastAction } from "@/components/ui/toast";
 import { toast } from "@/hooks/use-toast";
-import { ChartPresentationSettings } from "@/lib/ChartPresentationSettings";
 import { fetchResearchCompletion } from "@/lib/ai-chat";
+import { DataProcessingSettings } from "@/lib/settings/DataProcessingSettings";
 import { useState } from "react";
+import { create } from "zustand";
 
 export type ExplorationEvent = {
   userMessage?: string | undefined;
@@ -20,8 +19,8 @@ interface DataStore {
 
   activateIdeaSelection: () => void;
   addSettingUpdateEvent: (
-    pastSettings: ChartPresentationSettings,
-    newSettings: ChartPresentationSettings
+    pastSettings: DataProcessingSettings,
+    newSettings: DataProcessingSettings
   ) => void;
   addDataIdeaEvent: (payload: object) => void;
 
@@ -91,8 +90,8 @@ export const useExploratoryStore = create<DataStore>((set, get) => {
   };
 
   const addSettingUpdateEvent = async (
-    pastSettings: ChartPresentationSettings,
-    newSettings: ChartPresentationSettings
+    pastSettings: DataProcessingSettings,
+    newSettings: DataProcessingSettings
   ) => {
     const timeout = setTimeout(() => {
       console.log("Now get feedback :)");

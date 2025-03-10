@@ -148,6 +148,7 @@ export const VegaLiteChart = ({
   return (
     <VegaLite
       spec={spec}
+      actions={false}
       style={{ cursor: "pointer" }}
       className={cn("flex-1", className, "rounded-sm overflow-hidden min-h-40")}
     />

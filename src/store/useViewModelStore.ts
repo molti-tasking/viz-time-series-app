@@ -1,12 +1,12 @@
 import { ClusteringWorker } from "@/lib/clustering.worker";
+import { ClusterView } from "@/lib/clusteringOverTime";
 import * as Comlink from "comlink";
 import _ from "lodash";
 import { create } from "zustand";
-import { useRawDataStore } from "./useRawDataStore";
-import { useViewSettingsStore } from "./useViewSettingsStore";
-
-import { ClusterView } from "@/lib/clusteringOverTime";
 import Worker from "../lib/clustering.worker?worker";
+import { useClusterProcessingSettingsStore } from "./ClusterProcessingSettingsStore";
+import { useRawDataStore } from "./useRawDataStore";
+import { useStreamClustersSettingsStore } from "./useStreamClustersSettingsStore";
 
 interface DataStore {
   aggregated: Record<string, number>[][];
@@ -43,14 +43,16 @@ export const useViewModelStore = create<DataStore>((set, get) => {
     console.time("ViewModel basic data process duration " + String(timerName));
     const dimensions = useRawDataStore.getState().dimensions;
     const values = useRawDataStore.getState().values;
-    const { updateSettings, ...presentationSettings } =
-      useViewSettingsStore.getState();
-    console.log("Settings: ", presentationSettings);
-
+    const { updateSettings, ...streamClusterSettings } =
+      useStreamClustersSettingsStore.getState();
+    console.log("Settings: ", streamClusterSettings);
+    const { updateSettings: update, ...dataProcessingSettings } =
+      useClusterProcessingSettingsStore.getState();
+    console.log("Settings: ", update);
     const aggregated = await workerApi.aggregator(
       values,
       dimensions,
-      presentationSettings
+      dataProcessingSettings
     );
     console.timeEnd(
       "ViewModel basic data process duration " + String(timerName)
@@ -68,13 +70,13 @@ export const useViewModelStore = create<DataStore>((set, get) => {
       opacity: number;
       lastDimension: number | undefined;
     }[][] = [];
-    if (presentationSettings.mode === "highlighted") {
+    if (streamClusterSettings.chartMode === "highlighted") {
       highlightInfo = await workerApi.highlighter(
         aggregated.aggregated,
         clusterAssignment,
         updatedClusterAssignmentHistory.slice(
           0,
-          presentationSettings.clusterAssignmentHistoryDepth
+          streamClusterSettings.clusterAssignmentHistoryDepth
         )
       );
     }
@@ -94,14 +96,17 @@ export const useViewModelStore = create<DataStore>((set, get) => {
     );
     const dimensions = useRawDataStore.getState().dimensions;
     const values = useRawDataStore.getState().values;
-    const { updateSettings, ...presentationSettings } =
-      useViewSettingsStore.getState();
-    console.log("Settings: ", presentationSettings);
+    const { updateSettings, ...streamClusterSettings } =
+      useStreamClustersSettingsStore.getState();
+    console.log("Settings: ", streamClusterSettings);
+    const { updateSettings: update, ...dataProcessingSettings } =
+      useClusterProcessingSettingsStore.getState();
+    console.log("Settings: ", update);
 
     const { clustersInTime } = await workerApi.clusteringOverTime(
       values,
       dimensions,
-      presentationSettings
+      dataProcessingSettings
     );
 
     console.timeEnd(

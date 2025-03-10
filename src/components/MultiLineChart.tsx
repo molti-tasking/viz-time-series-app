@@ -93,5 +93,7 @@ export const MultiLineChart = () => {
     },
   };
 
-  return <VegaLite spec={spec} className="container w-full mt-2" />;
+  return (
+    <VegaLite spec={spec} actions={false} className="container w-full mt-2" />
+  );
 };

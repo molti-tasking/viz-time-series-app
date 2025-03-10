@@ -193,7 +193,7 @@ export const VegaLiteHighlightedChart = ({
         "flex-1",
         "rounded-sm overflow-hidden min-h-20 h-full",
         isSelecting
-          ? "hover:-translate-y-0.5 hover:bg-gray-50 hover:shadow-lg rounded-lg overflow-hidden transition-all duration-300"
+          ? "hover:-translate-y-0.5 hover:bg-gray-50 hover:shadow-lg rounded-lg transition-all duration-300"
           : ""
       )}
     >

@@ -1,6 +1,7 @@
 import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter } from "react-router";
+import { RouterProvider } from "react-router/dom";
 import ErrorPage from "./error-page";
 import "./index.css";
 import AggrLine from "./routes/aggregated-line";
@@ -10,6 +11,7 @@ import MutliAggregatedLine from "./routes/multi-aggregated-line";
 import MutliAggregatedTreeMap from "./routes/multi-aggregated-treemap";
 import MultiLine from "./routes/multi-line";
 import Root from "./routes/root";
+import Streamclusters from "./routes/streamclusters";
 
 const router = createBrowserRouter([
   {
@@ -19,6 +21,7 @@ const router = createBrowserRouter([
 
     children: [
       { path: "", element: <Home /> },
+      { path: "streamclusters", element: <Streamclusters /> },
       { path: "anu", element: <Anu />, errorElement: <ErrorPage /> },
       {
         path: "multi-line",

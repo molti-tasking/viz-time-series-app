@@ -1,11 +1,11 @@
 import { AggregatedClusterView } from "@/components/AggregatedClusterView";
-import { ClusterChartPreferencesPopover } from "@/components/ClusterChartPreferencesPopover";
 import { MultiAggregatedLineChart } from "@/components/MultiAggregatedLineChart";
+import { VisualizationPreferencesPopover } from "@/components/forms/VisualizationPreferencesPopover";
+import { useStreamClustersSettingsStore } from "@/store/useStreamClustersSettingsStore";
 import { useViewModelStore } from "@/store/useViewModelStore";
-import { useViewSettingsStore } from "@/store/useViewSettingsStore";
 
 export default function MutliAggregatedLine() {
-  const mode = useViewSettingsStore((state) => state.mode);
+  const mode = useStreamClustersSettingsStore((state) => state.layoutMode);
   const aggregated = useViewModelStore((data) => data.aggregated);
 
   return (
@@ -14,10 +14,10 @@ export default function MutliAggregatedLine() {
         <div className="text-muted-foreground">
           Detected {aggregated.length} clusters.
         </div>
-        <ClusterChartPreferencesPopover />
+        <VisualizationPreferencesPopover />
         {/* <pre>{JSON.stringify(presentationSettings)}</pre> */}
       </div>
-      {mode === "clusters" ? (
+      {mode === "clusterMap" ? (
         <AggregatedClusterView />
       ) : (
         <MultiAggregatedLineChart />

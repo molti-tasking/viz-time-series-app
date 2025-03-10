@@ -1,5 +1,5 @@
-import { ChartPresentationSettings } from "./ChartPresentationSettings";
 import { clusteringData } from "./clusteringData";
+import { DataProcessingSettings } from "./settings/DataProcessingSettings";
 
 export type ClusterView = { timestamp: string; clusters: [string, number][] };
 
@@ -21,7 +21,7 @@ type ClusteringReturn = {
 export const clusteringOverTime = (
   rawData: Record<string, number>[],
   dimensions: string[],
-  settings: ChartPresentationSettings
+  settings: DataProcessingSettings
 ): ClusteringReturn => {
   // First we gonna define the return type. Then we gonna skip the first settings.dataTicks - 1 values in order to build the first cluster based on those. Then we iterate over the full list afterwards
   const returnValues: ClusterView[] = [];

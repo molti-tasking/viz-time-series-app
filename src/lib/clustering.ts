@@ -1,5 +1,5 @@
-import { ChartPresentationSettings } from "./ChartPresentationSettings";
 import { clusteringData } from "./clusteringData";
+import { DataProcessingSettings } from "./settings/DataProcessingSettings";
 import { dataWrappingProcess } from "./wrapping";
 
 type AggregatedProps = {
@@ -19,14 +19,14 @@ type AggregatedProps = {
 export const aggregator = (
   rawData: Record<string, number>[],
   dimensions: string[],
-  settings: ChartPresentationSettings
+  dataProcessingSettings: DataProcessingSettings
 ): AggregatedProps => {
   // ----------------
   // Filtering data to time
   // ----------------
   let dataToBeClustered = rawData;
-  if (settings.dataTicks) {
-    dataToBeClustered = rawData.slice(-1 * settings.dataTicks);
+  if (dataProcessingSettings.dataTicks) {
+    dataToBeClustered = rawData.slice(-1 * dataProcessingSettings.dataTicks);
   }
 
   // ----------------
@@ -35,13 +35,13 @@ export const aggregator = (
   let aggregated: Record<string, number>[][] = clusteringData(
     dataToBeClustered,
     dimensions,
-    settings
+    dataProcessingSettings
   );
 
   // ----------------
   // Wrapping of boring data now after we clustered it.
   // ----------------
-  aggregated = dataWrappingProcess(aggregated, settings);
+  aggregated = dataWrappingProcess(aggregated, dataProcessingSettings);
 
   // ----------------
   // Getting meta data, like all cols and y-domain

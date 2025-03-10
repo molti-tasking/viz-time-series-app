@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
+import { useStreamClustersSettingsStore } from "@/store/useStreamClustersSettingsStore";
 import { useViewModelStore } from "@/store/useViewModelStore";
-import { useViewSettingsStore } from "@/store/useViewSettingsStore";
 import { useState } from "react";
 import { clusterColors } from "./clusterColors";
 import {
@@ -31,7 +31,7 @@ export const ClusterLegend = () => {
 };
 
 const HistoryBars = () => {
-  const clusterAssignmentHistoryDepth = useViewSettingsStore(
+  const clusterAssignmentHistoryDepth = useStreamClustersSettingsStore(
     (state) => state.clusterAssignmentHistoryDepth
   );
   const clusterAssignmentHistory = useViewModelStore(

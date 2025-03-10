@@ -1,4 +1,4 @@
-import { ChartPresentationSettings } from "./ChartPresentationSettings";
+import { DataProcessingSettings } from "./settings/DataProcessingSettings";
 
 type AggregatedProps = {
   aggregated: Record<string, number>[][];
@@ -17,7 +17,7 @@ type AggregatedProps = {
 export const aggregatorUnused = (
   rawData: Record<string, number>[],
   dimensions: string[],
-  settings: ChartPresentationSettings
+  settings: DataProcessingSettings
 ): AggregatedProps => {
   console.count("Called aggregator");
   let dataToBeClustered = rawData;
@@ -66,8 +66,6 @@ export const aggregatorUnused = (
         );
       });
     });
-  } else if ("clusterCount" in settings && !!settings.clusterCount) {
-    aggregated = clustering(dataToBeClustered, settings.clusterCount);
   }
 
   if (

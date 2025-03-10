@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
+import { useClusterProcessingSettingsStore } from "@/store/ClusterProcessingSettingsStore";
 import { useRawDataStore } from "@/store/useRawDataStore";
 import { useViewModelStore } from "@/store/useViewModelStore";
-import { useViewSettingsStore } from "@/store/useViewSettingsStore";
 import { timeFormat } from "d3";
 import { useEffect } from "react";
 import { clusterColors } from "./clusterColors";
@@ -10,7 +10,7 @@ export const AggregatedClusterView = () => {
   const values = useRawDataStore((state) => state.values);
   const dimensions = useRawDataStore((state) => state.dimensions);
 
-  const presentationSettings = useViewSettingsStore();
+  const presentationSettings = useClusterProcessingSettingsStore();
 
   const { clustersInTime, processClustersInTimeData } = useViewModelStore();
 

@@ -1,11 +1,10 @@
-import { ChartPresentationSettings } from "./ChartPresentationSettings";
-import { clusteringByCount } from "./clusteringByCount";
 import { clusteringDBSCAN } from "./clusteringDBSCAN";
+import { DataProcessingSettings } from "./settings/DataProcessingSettings";
 
 export const clusteringData = (
   dataToBeClustered: Record<string, number>[],
   dimensions: string[],
-  settings: ChartPresentationSettings
+  settings: DataProcessingSettings
 ) => {
   if (dataToBeClustered.length !== settings.dataTicks) {
     console.warn(
@@ -66,8 +65,6 @@ export const clusteringData = (
 
       return result;
     });
-  } else if ("clusterCount" in settings && !!settings.clusterCount) {
-    return clusteringByCount(dataToBeClustered, settings.clusterCount);
   }
 
   return [dataToBeClustered];

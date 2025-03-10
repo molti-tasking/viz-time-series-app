@@ -1,6 +1,6 @@
-import { ChartPresentationSettings } from "./ChartPresentationSettings.ts";
 import { aggregator } from "./clustering.ts";
 import { aggregatorUnused } from "./clusteringUnused.ts";
+import { DataProcessingSettings } from "./settings/DataProcessingSettings.ts";
 
 const inputValues = [
   {
@@ -432,9 +432,8 @@ const dimensions = [
   "Col 7",
   "Col 8",
 ];
-const presentationSettings: ChartPresentationSettings = {
+const presentationSettings: DataProcessingSettings = {
   dataTicks: 20,
-  mode: "multiline" as const,
   eps: 15,
   ignoreBoringDataMode: "off",
 };

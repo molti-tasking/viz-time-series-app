@@ -1,4 +1,4 @@
-import { ChartPresentationSettings } from "@/lib/ChartPresentationSettings";
+import { DataProcessingSettings } from "@/lib/settings/DataProcessingSettings";
 import { ClassValue } from "clsx";
 
 export type ChartProps = {
@@ -6,5 +6,5 @@ export type ChartProps = {
   className: ClassValue;
   yDomain: [number, number];
   saveScreenSpace?: boolean;
-  mode: ChartPresentationSettings["mode"];
+  mode: DataProcessingSettings["mode"];
 };
